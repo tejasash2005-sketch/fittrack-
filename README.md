@@ -91,7 +91,7 @@ FitTrack/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/FitTrack.git
+git clone https://github.com/tejasash2005-skecth/FitTrack.git
 cd FitTrack
 ```
 
