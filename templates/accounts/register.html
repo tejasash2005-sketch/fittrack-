@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register — FitTrack</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+:root { --bg:#080c12;--bg2:#0d1420;--card:#111827;--border:#1e2d42;--accent:#00d4ff;--accent-glow:rgba(0,212,255,0.15);--accent3:#7c3aed;--green:#10b981;--text:#f1f5f9;--text2:#94a3b8;--text3:#475569; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.wrap{width:100%;max-width:520px;}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:28px;justify-content:center;}
+.brand-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--accent),var(--accent3));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 24px var(--accent-glow);}
+.brand-name{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;letter-spacing:3px;}
+.brand-name span{color:var(--accent);}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:36px;}
+.title{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;margin-bottom:4px;}
+.sub{font-size:13px;color:var(--text2);margin-bottom:24px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-group{margin-bottom:16px;}
+.label{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px;letter-spacing:0.5px;text-transform:uppercase;}
+.inp-wrap{position:relative;}
+.inp-wrap i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:15px;}
+.inp{width:100%;background:#0d1420;border:1px solid var(--border);border-radius:8px;padding:11px 13px 11px 40px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:all 0.2s;}
+.inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);}
+.inp::placeholder{color:var(--text3);}
+.errorlist{list-style:none;margin-top:6px;}
+.errorlist li{font-size:12px;color:#ef4444;}
+.btn{width:100%;background:var(--accent);color:#080c12;border:none;border-radius:8px;padding:13px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn:hover{background:#00b8d9;box-shadow:0 0 20px var(--accent-glow);}
+.link{text-align:center;margin-top:16px;font-size:14px;color:var(--text2);}
+.link a{color:var(--accent);text-decoration:none;font-weight:600;}
+.steps{display:flex;gap:8px;margin-bottom:24px;align-items:center;}
+.step{width:32px;height:4px;border-radius:2px;background:var(--border);}
+.step.active{background:var(--accent);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <div class="brand-icon">⚡</div>
+    <div class="brand-name">FIT<span>TRACK</span></div>
+  </div>
+  <div class="card">
+    <div class="title">Create Your Account</div>
+    <div class="sub">Start your smart fitness journey today — it's free</div>
+
+    {% for message in messages %}
+    <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#ef4444;">{{ message }}</div>
+    {% endfor %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="row2">
+        <div class="form-group">
+          <label class="label">First Name</label>
+          <div class="inp-wrap"><i class="bi bi-person"></i><input type="text" name="first_name" class="inp" placeholder="John" required></div>
+          {% if form.first_name.errors %}<ul class="errorlist">{% for e in form.first_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="label">Last Name</label>
+          <div class="inp-wrap"><i class="bi bi-person"></i><input type="text" name="last_name" class="inp" placeholder="Doe" required></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="label">Username</label>
+        <div class="inp-wrap"><i class="bi bi-at"></i><input type="text" name="username" class="inp" placeholder="johndoe_fit" required></div>
+        {% if form.username.errors %}<ul class="errorlist">{% for e in form.username.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      <div class="form-group">
+        <label class="label">Email</label>
+        <div class="inp-wrap"><i class="bi bi-envelope"></i><input type="email" name="email" class="inp" placeholder="john@example.com" required></div>
+      </div>
+      <div class="row2">
+        <div class="form-group">
+          <label class="label">Password</label>
+          <div class="inp-wrap"><i class="bi bi-lock"></i><input type="password" name="password1" class="inp" placeholder="Min 8 chars" required></div>
+          {% if form.password1.errors %}<ul class="errorlist">{% for e in form.password1.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="label">Confirm Password</label>
+          <div class="inp-wrap"><i class="bi bi-lock-fill"></i><input type="password" name="password2" class="inp" placeholder="Repeat password" required></div>
+          {% if form.password2.errors %}<ul class="errorlist">{% for e in form.password2.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+      </div>
+      <button type="submit" class="btn"><i class="bi bi-rocket-takeoff-fill"></i> Launch My Fitness Journey</button>
+    </form>
+    <div class="link">Already have an account? <a href="{% url 'accounts:login' %}">Sign in →</a></div>
+  </div>
+</div>
+</body>
+</html>

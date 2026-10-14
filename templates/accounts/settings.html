@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Settings{% endblock %}
+{% block page_title %}⚙️ Settings{% endblock %}
+{% block content %}
+<div style="max-width:640px;" class="fade-up">
+  <div class="card">
+    <div class="card-header-ft"><div class="card-title-ft"><i class="bi bi-gear-fill" style="color:var(--accent);"></i> App Settings</div></div>
+    <div class="card-body-ft">
+      <form method="post">
+        {% csrf_token %}
+        <div style="font-family:var(--font-display);font-size:13px;letter-spacing:1px;color:var(--text-secondary);margin-bottom:14px;">DAILY GOALS</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:24px;">
+          <div><label class="form-label-ft">CALORIE GOAL (kcal)</label><input type="number" name="daily_calorie_goal" class="form-ctrl" value="{{ profile.daily_calorie_goal }}"></div>
+          <div><label class="form-label-ft">WATER GOAL (L)</label><input type="number" name="daily_water_goal" class="form-ctrl" value="{{ profile.daily_water_goal }}" step="0.1"></div>
+          <div><label class="form-label-ft">STEPS GOAL</label><input type="number" name="daily_steps_goal" class="form-ctrl" value="{{ profile.daily_steps_goal }}" step="500"></div>
+        </div>
+        <hr class="divider">
+        <div style="font-family:var(--font-display);font-size:13px;letter-spacing:1px;color:var(--text-secondary);margin-bottom:14px;">PREFERENCES</div>
+        <div style="margin-bottom:14px;">
+          <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:12px 16px;background:var(--bg-secondary);border-radius:8px;">
+            <div><div style="font-weight:600;font-size:14px;">🔔 Push Notifications</div><div style="font-size:12px;color:var(--text-muted);">Receive workout reminders and achievement alerts</div></div>
+            <input type="checkbox" name="notifications_enabled" {% if profile.notifications_enabled %}checked{% endif %} style="width:18px;height:18px;accent-color:var(--accent);">
+          </label>
+        </div>
+        <div style="margin-bottom:24px;">
+          <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:12px 16px;background:var(--bg-secondary);border-radius:8px;">
+            <div><div style="font-weight:600;font-size:14px;">🌙 Dark Mode</div><div style="font-size:12px;color:var(--text-muted);">Always enabled for the best experience</div></div>
+            <input type="checkbox" name="dark_mode" checked disabled style="width:18px;height:18px;accent-color:var(--accent);">
+          </label>
+        </div>
+        <button type="submit" class="btn-ft btn-primary-ft"><i class="bi bi-check-circle-fill"></i> Save Settings</button>
+      </form>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px;">
+    <div class="card-header-ft"><div class="card-title-ft"><i class="bi bi-shield-lock" style="color:var(--accent2);"></i> Security</div></div>
+    <div class="card-body-ft">
+      <a href="{% url 'accounts:change_password' %}" class="btn-ft btn-secondary-ft"><i class="bi bi-lock"></i> Change Password</a>
+      <a href="{% url 'accounts:logout' %}" class="btn-ft btn-danger-ft" style="margin-left:8px;"><i class="bi bi-box-arrow-right"></i> Sign Out</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

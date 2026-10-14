@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Analytics{% endblock %}
+{% block page_title %}📈 Analytics{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;" class="fade-up">
+  <div style="font-size:14px;color:var(--text-secondary);">Last 30 days · Deep dive into your fitness data</div>
+  <div style="display:flex;gap:8px;">
+    <a href="{% url 'workouts:list' %}" class="btn-ft btn-secondary-ft btn-sm-ft"><i class="bi bi-lightning-charge"></i> Workouts</a>
+    <a href="{% url 'diet:dashboard' %}" class="btn-ft btn-secondary-ft btn-sm-ft"><i class="bi bi-egg-fried"></i> Nutrition</a>
+    <a href="{% url 'metrics:dashboard' %}" class="btn-ft btn-secondary-ft btn-sm-ft"><i class="bi bi-activity"></i> Metrics</a>
+  </div>
+</div>
+
+<!-- Charts grid -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;" class="fade-up fade-up-d1">
+  <div class="card">
+    <div class="card-header-ft">
+      <div class="card-title-ft"><i class="bi bi-graph-up-arrow" style="color:var(--accent);"></i> Weight Trend (30 Days)</div>
+    </div>
+    <div class="card-body-ft"><canvas id="weightChart" height="220"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header-ft">
+      <div class="card-title-ft"><i class="bi bi-fire" style="color:var(--accent2);"></i> Daily Calories (30 Days)</div>
+    </div>
+    <div class="card-body-ft"><canvas id="caloriesChart" height="220"></canvas></div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="fade-up fade-up-d2">
+  <div class="card">
+    <div class="card-header-ft">
+      <div class="card-title-ft"><i class="bi bi-person-walking" style="color:var(--green);"></i> Daily Steps (30 Days)</div>
+    </div>
+    <div class="card-body-ft"><canvas id="stepsChart" height="220"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header-ft">
+      <div class="card-title-ft"><i class="bi bi-moon-stars-fill" style="color:var(--accent3);"></i> Sleep Duration (30 Days)</div>
+    </div>
+    <div class="card-body-ft"><canvas id="sleepChart" height="220"></canvas></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof Chart === 'undefined') return;
+
+  const labels = {{ labels|safe }};
+  const weightData = {{ weight_data|safe }};
+  const caloriesData = {{ calories_data|safe }};
+  const stepsData = {{ steps_data|safe }};
+  const sleepData = {{ sleep_data|safe }};
+
+  const chartOpts = (color) => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { maxTicksLimit: 8, color: '#94a3b8' } },
+      y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } }
+    }
+  });
+
+  const commonLine = (color, data) => ({
+    type: 'line',
+    data: { labels, datasets: [{ data: data, borderColor: color, backgroundColor: color + '15', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 4, pointHoverRadius: 6, spanGaps: true }] },
+    options: chartOpts(color)
+  });
+
+  const commonBar = (color, data) => ({
+    type: 'bar',
+    data: { labels, datasets: [{ data: data, backgroundColor: color + '66', borderColor: color, borderWidth: 1.5, borderRadius: 4 }] },
+    options: chartOpts(color)
+  });
+
+  new Chart(document.getElementById('weightChart').getContext('2d'), commonLine('#00d4ff', weightData));
+  new Chart(document.getElementById('caloriesChart').getContext('2d'), commonBar('#ff6b35', caloriesData));
+  new Chart(document.getElementById('stepsChart').getContext('2d'), commonBar('#10b981', stepsData));
+  new Chart(document.getElementById('sleepChart').getContext('2d'), commonLine('#7c3aed', sleepData));
+});
+</script>
+{% endblock %}

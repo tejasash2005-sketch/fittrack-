@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Log Workout{% endblock %}
+{% block page_title %}⚡ Log Workout{% endblock %}
+
+{% block content %}
+<div style="max-width:800px;" class="fade-up">
+  <div class="card">
+    
+    <div class="card-header-ft">
+      <div class="card-title-ft">
+        <i class="bi bi-plus-circle-fill" style="color:var(--accent);"></i> 
+        New Workout Session
+      </div>
+      <a href="{% url 'workouts:list' %}" class="btn-ft btn-secondary-ft btn-sm-ft">
+        <i class="bi bi-arrow-left"></i> Back
+      </a>
+    </div>
+
+    <div class="card-body-ft">
+      <form method="post" id="workoutForm">
+        {% csrf_token %}
+
+        <!-- Name + Date -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+          <div>
+            <label class="form-label-ft">WORKOUT NAME *</label>
+            <input type="text" name="name" class="form-ctrl" required value="Workout Session">
+          </div>
+          <div>
+            <label class="form-label-ft">DATE *</label>
+            <input type="date" name="date" class="form-ctrl" value="{{ today }}" required>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
+          <div>
+            <label class="form-label-ft">DURATION (MINUTES)</label>
+            <input type="number" name="duration" class="form-ctrl" min="0" max="480" value="0">
+          </div>
+          <div>
+            <label class="form-label-ft">CALORIES BURNED</label>
+            <input type="number" name="calories" class="form-ctrl" min="0" step="0.1" value="0">
+          </div>
+          <div>
+            <label class="form-label-ft">LOCATION</label>
+            <input type="text" name="location" class="form-ctrl" placeholder="Gym, Home, Park">
+          </div>
+        </div>
+
+        <!-- Sliders -->
+        <div style="background:var(--bg-secondary);border-radius:10px;padding:20px;margin-bottom:20px;">
+          <div style="font-weight:600;margin-bottom:16px;">WORKOUT FEEL</div>
+
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+            
+            <div>
+              <label>EFFORT <span id="effort-val">5</span>/10</label>
+              <input type="range" name="effort" min="1" max="10" value="5"
+                     oninput="document.getElementById('effort-val').textContent=this.value">
+            </div>
+
+            <div>
+              <label>MOOD BEFORE <span id="mood-before-val">5</span>/10</label>
+              <input type="range" name="mood_before" min="1" max="10" value="5"
+                     oninput="document.getElementById('mood-before-val').textContent=this.value">
+            </div>
+
+            <div>
+              <label>MOOD AFTER <span id="mood-after-val">7</span>/10</label>
+              <input type="range" name="mood_after" min="1" max="10" value="7"
+                     oninput="document.getElementById('mood-after-val').textContent=this.value">
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div style="margin-bottom:20px;">
+          <label class="form-label-ft">NOTES</label>
+          <textarea name="notes" class="form-ctrl" rows="3"></textarea>
+        </div>
+
+        <!-- Templates -->
+        <div style="margin-bottom:20px;">
+          <label class="form-label-ft">QUICK TEMPLATES</label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <button type="button" onclick="fillTemplate('Push Day',45,280)">💪 Push</button>
+            <button type="button" onclick="fillTemplate('Pull Day',50,300)">🏋️ Pull</button>
+            <button type="button" onclick="fillTemplate('Leg Day',60,350)">🦵 Legs</button>
+            <button type="button" onclick="fillTemplate('Cardio Run',30,250)">🏃 Cardio</button>
+            <button type="button" onclick="fillTemplate('HIIT',25,320)">⚡ HIIT</button>
+            <button type="button" onclick="fillTemplate('Yoga',45,150)">🧘 Yoga</button>
+            <button type="button" onclick="fillTemplate('Full Body',55,400)">🏋️ Full</button>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <div style="display:flex;gap:12px;">
+          <button type="submit" class="btn-ft btn-primary-ft" style="flex:1;">
+            Log Workout
+          </button>
+          <a href="{% url 'workouts:list' %}" class="btn-ft btn-secondary-ft">Cancel</a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function fillTemplate(name, duration, calories) {
+  document.querySelector('[name="name"]').value = name;
+  document.querySelector('[name="duration"]').value = duration;
+  document.querySelector('[name="calories"]').value = calories;
+}
+</script>
+{% endblock %}

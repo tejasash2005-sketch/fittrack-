@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Food Database — Admin{% endblock %}
+{% block page_title %}🥗 Food Database Management{% endblock %}
+{% block content %}
+<div style="display:grid;grid-template-columns:360px 1fr;gap:20px;" class="fade-up">
+  <div class="card">
+    <div class="card-header-ft"><div class="card-title-ft"><i class="bi bi-plus-circle-fill" style="color:var(--green);"></i> Add Food Item</div></div>
+    <div class="card-body-ft">
+      <form method="post">
+        {% csrf_token %}
+        <div style="margin-bottom:12px;"><label class="form-label-ft">FOOD NAME *</label><input type="text" name="name" class="form-ctrl" required placeholder="e.g. Chicken Breast"></div>
+        <div style="margin-bottom:12px;"><label class="form-label-ft">CATEGORY</label>
+          <select name="category" class="form-ctrl">
+            <option value="protein">Protein</option><option value="carbs">Carbs</option><option value="fats">Fats</option>
+            <option value="vegetables">Vegetables</option><option value="fruits">Fruits</option><option value="dairy">Dairy</option>
+            <option value="grains">Grains</option><option value="snacks">Snacks</option><option value="beverages">Beverages</option><option value="other">Other</option>
+          </select>
+        </div>
+        <div style="margin-bottom:12px;"><label class="form-label-ft">SERVING SIZE (g)</label><input type="number" name="serving_size" class="form-ctrl" value="100" step="1"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+          <div><label class="form-label-ft">CALORIES</label><input type="number" name="calories" class="form-ctrl" value="0" step="0.1"></div>
+          <div><label class="form-label-ft">PROTEIN (g)</label><input type="number" name="protein" class="form-ctrl" value="0" step="0.1"></div>
+          <div><label class="form-label-ft">CARBS (g)</label><input type="number" name="carbs" class="form-ctrl" value="0" step="0.1"></div>
+          <div><label class="form-label-ft">FAT (g)</label><input type="number" name="fat" class="form-ctrl" value="0" step="0.1"></div>
+        </div>
+        <button type="submit" class="btn-ft btn-primary-ft" style="width:100%;justify-content:center;"><i class="bi bi-plus-circle"></i> Add Food Item</button>
+      </form>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header-ft"><div class="card-title-ft"><i class="bi bi-database" style="color:var(--accent);"></i> Food Database ({{ foods.count }} items)</div></div>
+    <div style="overflow-x:auto;max-height:600px;overflow-y:auto;">
+      <table class="table-ft">
+        <thead><tr><th>Name</th><th>Category</th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fat</th><th>Verified</th></tr></thead>
+        <tbody>
+          {% for food in foods %}
+          <tr>
+            <td style="font-weight:600;">{{ food.name }}</td>
+            <td><span class="badge-ft badge-cyan">{{ food.get_category_display }}</span></td>
+            <td style="color:var(--accent2);">{{ food.calories|floatformat:0 }} kcal</td>
+            <td>{{ food.protein|floatformat:1 }}g</td>
+            <td>{{ food.carbohydrates|floatformat:1 }}g</td>
+            <td>{{ food.fat|floatformat:1 }}g</td>
+            <td>{% if food.is_verified %}<span class="badge-ft badge-green">✓ Yes</span>{% else %}<span class="badge-ft badge-orange">Pending</span>{% endif %}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7"><div class="empty-state"><i class="bi bi-database"></i><p>No food items. Run seed command to populate.</p></div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

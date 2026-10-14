@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Premium Analytics{% endblock %}
+{% block page_title %}Premium ROI & Conversion{% endblock %}
+
+{% block content %}
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;" class="fade-up">
+    <div class="stat-card cyan">
+        <div class="stat-icon cyan"><i class="bi bi-people"></i></div>
+        <div class="stat-value">{{ total_users }}</div>
+        <div class="stat-label">TOTAL USERS</div>
+    </div>
+    <div class="stat-card purple">
+        <div class="stat-icon purple"><i class="bi bi-star-fill"></i></div>
+        <div class="stat-value">{{ premium_users }}</div>
+        <div class="stat-label">PREMIUM USERS</div>
+    </div>
+    <div class="stat-card green">
+        <div class="stat-icon green"><i class="bi bi-percent"></i></div>
+        <div class="stat-value">{{ conversion_rate }}%</div>
+        <div class="stat-label">CONVERSION RATE</div>
+    </div>
+    <div class="stat-card orange">
+        <div class="stat-icon orange"><i class="bi bi-currency-dollar"></i></div>
+        <div class="stat-value">${{ estimated_revenue|floatformat:2 }}</div>
+        <div class="stat-label">EST. MONTHLY REVENUE</div>
+    </div>
+</div>
+
+<div class="card fade-up fade-up-d1">
+    <div class="card-header-ft">
+        <div class="card-title-ft"><i class="bi bi-graph-up"></i> Premium Growth Trend</div>
+    </div>
+    <div class="card-body-ft" style="height: 300px;">
+        <canvas id="premiumChart"></canvas>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const ctx = document.getElementById('premiumChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+            label: 'Premium Subscribers',
+            data: [12, 19, 34, 45, 60, {{ premium_users }}],
+            borderColor: '#7c3aed',
+            backgroundColor: 'rgba(124,58,237,0.1)',
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: { beginAtZero: true, grid: { color: '#1e2d42' } },
+            x: { grid: { color: '#1e2d42' } }
+        }
+    }
+});
+</script>
+{% endblock %}

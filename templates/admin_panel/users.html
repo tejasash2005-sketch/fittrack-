@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}User Management{% endblock %}
+{% block page_title %}👥 User Management{% endblock %}
+{% block content %}
+<div style="margin-bottom:16px;display:flex;gap:12px;align-items:center;" class="fade-up">
+  <form method="get" style="display:flex;gap:8px;flex:1;">
+    <input type="text" name="search" value="{{ search }}" class="form-ctrl" placeholder="Search users by name or email..." style="max-width:360px;">
+    <button type="submit" class="btn-ft btn-primary-ft btn-sm-ft"><i class="bi bi-search"></i> Search</button>
+    {% if search %}<a href="{% url 'admin_panel:user_management' %}" class="btn-ft btn-secondary-ft btn-sm-ft">Clear</a>{% endif %}
+  </form>
+  <span style="font-size:13px;color:var(--text-muted);">{{ users.count }} users</span>
+</div>
+<div class="card fade-up fade-up-d1">
+  <div style="overflow-x:auto;">
+    <table class="table-ft">
+      <thead><tr><th>User</th><th>Email</th><th>Joined</th><th>Status</th><th>Workouts</th><th>Premium</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent3),var(--accent));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-primary);">{{ user.get_full_name|default:user.username }}</div>
+                <div style="font-size:11px;color:var(--text-muted);">@{{ user.username }}</div>
+              </div>
+            </div>
+          </td>
+          <td style="font-size:12px;">{{ user.email|default:"—" }}</td>
+          <td style="font-size:12px;">{{ user.date_joined|date:"M d, Y" }}</td>
+          <td>
+            {% if user.is_superuser %}<span class="badge-ft badge-purple">👑 Admin</span>
+            {% elif user.is_staff %}<span class="badge-ft badge-cyan">🛡️ Staff</span>
+            {% elif user.is_active %}<span class="badge-ft badge-green">✅ Active</span>
+            {% else %}<span class="badge-ft badge-red">🚫 Inactive</span>{% endif %}
+          </td>
+          <td style="font-size:13px;">{{ user.workout_sessions.count }}</td>
+          <td>
+            <a href="{% url 'admin_panel:toggle_premium' user.pk %}" class="btn-ft btn-sm-ft {% if user.profile.is_premium %}btn-success-ft{% else %}btn-secondary-ft{% endif %}">
+              {% if user.profile.is_premium %}⭐ Premium{% else %}Free{% endif %}
+            </a>
+          </td>
+          <td>
+            <div style="display:flex;gap:6px;">
+              <a href="{% url 'admin_panel:user_detail' user.pk %}" class="btn-ft btn-secondary-ft btn-sm-ft"><i class="bi bi-eye"></i> View</a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7"><div class="empty-state"><i class="bi bi-people"></i><p>No users found.</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

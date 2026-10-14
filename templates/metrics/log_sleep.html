@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Log Sleep{% endblock %}
+{% block page_title %}😴 Sleep Tracker{% endblock %}
+{% block content %}
+<div style="max-width:500px;" class="fade-up">
+  <div class="card">
+    <div class="card-header-ft">
+      <div class="card-title-ft"><i class="bi bi-moon-stars-fill" style="color:var(--accent3);"></i> Log Sleep</div>
+      <a href="{% url 'metrics:dashboard' %}" class="btn-ft btn-secondary-ft btn-sm-ft"><i class="bi bi-arrow-left"></i> Back</a>
+    </div>
+    <div class="card-body-ft">
+      <form method="post">
+        {% csrf_token %}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+          <div><label class="form-label-ft">DATE (WAKE UP)</label><input type="date" name="date" class="form-ctrl" value="{{ today }}"></div>
+          <div><label class="form-label-ft">SLEEP TIME</label><input type="time" name="sleep_time" class="form-ctrl" value="22:00"></div>
+          <div><label class="form-label-ft">WAKE TIME</label><input type="time" name="wake_time" class="form-ctrl" value="06:00"></div>
+          <div><label class="form-label-ft">DURATION (HOURS)</label><input type="number" name="duration" class="form-ctrl" value="8" step="0.1" min="0" max="24"></div>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label class="form-label-ft">SLEEP QUALITY <span id="qualityVal" style="color:var(--accent3);">3</span>/5</label>
+          <input type="range" name="quality" min="1" max="5" value="3" class="form-ctrl" style="padding:6px 0;" oninput="document.getElementById('qualityVal').textContent=this.value">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);"><span>😴 Poor</span><span>😐 Okay</span><span>😊 Great</span></div>
+        </div>
+        <div style="margin-bottom:16px;"><label class="form-label-ft">NIGHT INTERRUPTIONS</label><input type="number" name="interruptions" class="form-ctrl" value="0" min="0" max="20"></div>
+        <div style="margin-bottom:20px;"><label class="form-label-ft">NOTES</label><textarea name="notes" class="form-ctrl" rows="2" placeholder="Feeling rested? Dreams? Stress?"></textarea></div>
+        <button type="submit" class="btn-ft btn-primary-ft" style="width:100%;justify-content:center;"><i class="bi bi-moon-stars"></i> Log Sleep</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Log Mood{% endblock %}
+{% block page_title %}😊 Mood Tracker{% endblock %}
+{% block content %}
+<div style="max-width:500px;" class="fade-up">
+  <div class="card">
+    <div class="card-header-ft">
+      <div class="card-title-ft"><i class="bi bi-emoji-smile-fill" style="color:var(--yellow);"></i> Log Today's Mood</div>
+      <a href="{% url 'metrics:dashboard' %}" class="btn-ft btn-secondary-ft btn-sm-ft"><i class="bi bi-arrow-left"></i> Back</a>
+    </div>
+    <div class="card-body-ft">
+      <form method="post">
+        {% csrf_token %}
+        <div style="margin-bottom:20px;text-align:center;">
+          <label class="form-label-ft" style="display:block;margin-bottom:12px;">HOW ARE YOU FEELING?</label>
+          <div style="display:flex;justify-content:center;gap:16px;font-size:40px;">
+            {% for val, label in "1:😢,2:😞,3:😐,4:😊,5:😄"|split:"," %}
+            {% endfor %}
+            <label style="cursor:pointer;opacity:0.5;transition:all 0.2s;" onmouseover="this.style.opacity='1';this.style.transform='scale(1.2)'" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'">
+              <input type="radio" name="mood" value="1" style="display:none;" required> 😢
+            </label>
+            <label style="cursor:pointer;opacity:0.5;transition:all 0.2s;" onmouseover="this.style.opacity='1';this.style.transform='scale(1.2)'" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'">
+              <input type="radio" name="mood" value="2" style="display:none;"> 😞
+            </label>
+            <label style="cursor:pointer;opacity:0.5;transition:all 0.2s;" onmouseover="this.style.opacity='1';this.style.transform='scale(1.2)'" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'">
+              <input type="radio" name="mood" value="3" style="display:none;" checked> 😐
+            </label>
+            <label style="cursor:pointer;opacity:0.5;transition:all 0.2s;" onmouseover="this.style.opacity='1';this.style.transform='scale(1.2)'" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'">
+              <input type="radio" name="mood" value="4" style="display:none;"> 😊
+            </label>
+            <label style="cursor:pointer;opacity:0.5;transition:all 0.2s;" onmouseover="this.style.opacity='1';this.style.transform='scale(1.2)'" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'">
+              <input type="radio" name="mood" value="5" style="display:none;"> 😄
+            </label>
+          </div>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label class="form-label-ft">ENERGY LEVEL <span id="energyVal" style="color:var(--yellow);">3</span>/5</label>
+          <input type="range" name="energy" min="1" max="5" value="3" class="form-ctrl" style="padding:6px 0;" oninput="document.getElementById('energyVal').textContent=this.value">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);"><span>🪫 Exhausted</span><span>⚡ Energetic</span><span>🚀 Supercharged</span></div>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label class="form-label-ft">STRESS LEVEL <span id="stressVal" style="color:var(--red);">5</span>/10</label>
+          <input type="range" name="stress" min="1" max="10" value="5" class="form-ctrl" style="padding:6px 0;" oninput="document.getElementById('stressVal').textContent=this.value">
+        </div>
+        <div style="margin-bottom:20px;"><label class="form-label-ft">NOTES</label><textarea name="notes" class="form-ctrl" rows="2" placeholder="What's on your mind?"></textarea></div>
+        <button type="submit" class="btn-ft btn-primary-ft" style="width:100%;justify-content:center;"><i class="bi bi-emoji-smile"></i> Log Mood</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

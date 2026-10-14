@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Exercise Library{% endblock %}
+{% block page_title %}🏋️ Exercise Library{% endblock %}
+
+{% block content %}
+
+<!-- Category Filters -->
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;" class="fade-up">
+  
+  <a href="{% url 'workouts:exercises' %}"
+     class="btn-ft {% if not category %}btn-primary-ft{% else %}btn-secondary-ft{% endif %} btn-sm-ft">
+    All
+  </a>
+
+  {% if categories %}
+    {% for cat in categories %}
+      <a href="?category={{ cat }}"
+         class="btn-ft {% if category == cat %}btn-primary-ft{% else %}btn-secondary-ft{% endif %} btn-sm-ft">
+        {{ cat|title }}
+      </a>
+    {% endfor %}
+  {% endif %}
+
+</div>
+
+<!-- Exercise Grid -->
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;" class="fade-up fade-up-d1">
+
+  {% if exercises %}
+    {% for ex in exercises %}
+      <div class="card" style="padding:18px;">
+
+        <!-- Header -->
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+          <div>
+            <div style="font-weight:700;font-size:15px;">
+              {{ ex.name|default:"Unnamed Exercise" }}
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);">
+              {{ ex.get_category_display|default:"-" }} · 
+              {{ ex.get_primary_muscle_display|default:"-" }}
+            </div>
+          </div>
+
+          <span class="badge-ft badge-cyan">
+            {{ ex.calories_per_minute|default:0|floatformat:0 }} kcal/min
+          </span>
+        </div>
+
+        <!-- Description -->
+        {% if ex.description %}
+          <p style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">
+            {{ ex.description|truncatechars:80 }}
+          </p>
+        {% endif %}
+
+        <!-- Footer -->
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+
+          <!-- Difficulty -->
+          <div style="display:flex;gap:3px;">
+            {% for i in "12345" %}
+              <div style="width:8px;height:8px;border-radius:2px;
+                background:{% if ex.difficulty and forloop.counter <= ex.difficulty %}var(--accent2){% else %}var(--border){% endif %};">
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Equipment -->
+          {% if ex.equipment %}
+            <div style="font-size:11px;color:var(--text-muted);">
+              <i class="bi bi-tools"></i> {{ ex.equipment }}
+            </div>
+          {% endif %}
+
+        </div>
+
+      </div>
+    {% endfor %}
+  {% else %}
+    <div style="grid-column:1/-1;" class="empty-state">
+      <i class="bi bi-list-check"></i>
+      <p>No exercises found.</p>
+    </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}{{ session.name }}{% endblock %}
+{% block page_title %}{{ session.name }}{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:16px;display:flex;gap:8px;" class="fade-up">
+  <a href="{% url 'workouts:list' %}" class="btn-ft btn-secondary-ft btn-sm-ft"><i class="bi bi-arrow-left"></i> Back</a>
+  <a href="{% url 'workouts:delete' session.pk %}" class="btn-ft btn-danger-ft btn-sm-ft" onclick="return confirm('Delete this workout?')"><i class="bi bi-trash"></i> Delete</a>
+</div>
+
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;" class="fade-up fade-up-d1">
+  <div class="card">
+    <div class="card-header-ft">
+      <div class="card-title-ft"><i class="bi bi-lightning-charge-fill" style="color:var(--accent2);"></i> {{ session.name }}</div>
+      <span class="badge-ft badge-green">{{ session.date|date:"M d, Y" }}</span>
+    </div>
+    <div class="card-body-ft">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+        <div style="background:var(--bg-secondary);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--accent);">{{ session.duration_minutes }}</div>
+          <div style="font-size:11px;color:var(--text-muted);">MINUTES</div>
+        </div>
+        <div style="background:var(--bg-secondary);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--accent2);">{{ session.total_calories_burned|floatformat:0 }}</div>
+          <div style="font-size:11px;color:var(--text-muted);">CALORIES</div>
+        </div>
+        <div style="background:var(--bg-secondary);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--yellow);">{{ session.perceived_effort }}/10</div>
+          <div style="font-size:11px;color:var(--text-muted);">EFFORT</div>
+        </div>
+        <div style="background:var(--bg-secondary);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:24px;">{% if session.mood_after >= 8 %}😄{% elif session.mood_after >= 6 %}😊{% elif session.mood_after >= 4 %}😐{% else %}😞{% endif %}</div>
+          <div style="font-size:11px;color:var(--text-muted);">MOOD AFTER</div>
+        </div>
+      </div>
+      {% if session.notes %}
+      <div style="background:var(--bg-secondary);border-radius:8px;padding:14px;">
+        <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;">NOTES</div>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">{{ session.notes }}</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header-ft"><div class="card-title-ft"><i class="bi bi-info-circle" style="color:var(--accent);"></i> Session Info</div></div>
+    <div class="card-body-ft">
+      {% if session.location %}<div style="margin-bottom:10px;"><span style="font-size:12px;color:var(--text-muted);">📍 LOCATION</span><div style="font-size:14px;font-weight:600;">{{ session.location }}</div></div>{% endif %}
+      <div style="margin-bottom:10px;"><span style="font-size:12px;color:var(--text-muted);">😊 MOOD BEFORE</span><div style="font-size:14px;font-weight:600;">{{ session.mood_before }}/10</div></div>
+      <div style="margin-bottom:10px;"><span style="font-size:12px;color:var(--text-muted);">💪 MOOD AFTER</span><div style="font-size:14px;font-weight:600;">{{ session.mood_after }}/10</div></div>
+      {% if session.heart_rate_avg %}<div style="margin-bottom:10px;"><span style="font-size:12px;color:var(--text-muted);">❤️ AVG HEART RATE</span><div style="font-size:14px;font-weight:600;">{{ session.heart_rate_avg }} BPM</div></div>{% endif %}
+      <div><span style="font-size:12px;color:var(--text-muted);">🕐 LOGGED AT</span><div style="font-size:14px;font-weight:600;">{{ session.created_at|date:"M d, Y H:i" }}</div></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

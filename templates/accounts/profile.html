@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}My Profile{% endblock %}
+{% block page_title %}👤 My Profile{% endblock %}
+
+{% block content %}
+<div style="display:grid;grid-template-columns:280px 1fr;gap:24px;" class="fade-up">
+  <!-- Profile sidebar -->
+  <div>
+    <div class="card" style="text-align:center;padding:28px 20px;margin-bottom:16px;">
+      <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--accent3),var(--accent));display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:0 auto 14px;border:3px solid var(--border-bright);overflow:hidden;">
+        {% if profile.avatar %}<img src="{{ profile.avatar.url }}" style="width:100%;height:100%;object-fit:cover;">
+        {% else %}{{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}{% endif %}
+      </div>
+      <div style="font-family:var(--font-display);font-size:20px;font-weight:700;">{{ request.user.get_full_name|default:request.user.username }}</div>
+      <div style="font-size:13px;color:var(--text-secondary);">@{{ request.user.username }}</div>
+      {% if profile.is_premium %}<div style="margin-top:8px;"><span class="badge-ft badge-green">⭐ Premium Member</span></div>{% endif %}
+      {% if profile.bmi %}
+      <div style="margin-top:16px;background:var(--bg-secondary);border-radius:10px;padding:12px;">
+        <div style="font-family:var(--font-display);font-size:28px;color:{% if profile.bmi < 25 %}var(--green){% elif profile.bmi < 30 %}var(--yellow){% else %}var(--red){% endif %};">{{ profile.bmi }}</div>
+        <div style="font-size:12px;color:var(--text-muted);">BMI · {{ profile.bmi_category }}</div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Achievements -->
+    <div class="card">
+      <div class="card-header-ft"><div class="card-title-ft"><i class="bi bi-trophy-fill" style="color:var(--yellow);"></i> Achievements</div></div>
+      <div class="card-body-ft">
+        {% if achievements %}
+          {% for a in achievements %}
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+            <span style="font-size:22px;">{{ a.get_badge_display|slice:":2" }}</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;">{{ a.get_badge_display|slice:"2:" }}</div>
+              <div style="font-size:11px;color:var(--text-muted);">{{ a.earned_at|date:"M d, Y" }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px;">Complete workouts to earn badges! 🏆</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile form -->
+  <div class="card">
+    <div class="card-header-ft">
+      <div class="card-title-ft"><i class="bi bi-pencil-fill" style="color:var(--accent);"></i> Edit Profile</div>
+      <a href="{% url 'accounts:change_password' %}" class="btn-ft btn-secondary-ft btn-sm-ft"><i class="bi bi-lock"></i> Change Password</a>
+    </div>
+    <div class="card-body-ft">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div style="font-family:var(--font-display);font-size:13px;font-weight:600;letter-spacing:1px;color:var(--text-secondary);margin-bottom:14px;">PERSONAL INFORMATION</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+          <div><label class="form-label-ft">FIRST NAME</label><input type="text" name="first_name" class="form-ctrl" value="{{ request.user.first_name }}"></div>
+          <div><label class="form-label-ft">LAST NAME</label><input type="text" name="last_name" class="form-ctrl" value="{{ request.user.last_name }}"></div>
+          <div><label class="form-label-ft">EMAIL</label><input type="email" name="email" class="form-ctrl" value="{{ request.user.email }}"></div>
+          <div><label class="form-label-ft">PHONE</label><input type="text" name="phone" class="form-ctrl" value="{{ profile.phone }}"></div>
+          <div><label class="form-label-ft">DATE OF BIRTH</label><input type="date" name="date_of_birth" class="form-ctrl" value="{{ profile.date_of_birth|date:'Y-m-d' }}"></div>
+          <div><label class="form-label-ft">GENDER</label>
+            <select name="gender" class="form-ctrl">
+              <option value="">Select</option>
+              <option value="M" {% if profile.gender == 'M' %}selected{% endif %}>Male</option>
+              <option value="F" {% if profile.gender == 'F' %}selected{% endif %}>Female</option>
+              <option value="O" {% if profile.gender == 'O' %}selected{% endif %}>Other</option>
+            </select>
+          </div>
+          <div><label class="form-label-ft">CITY</label><input type="text" name="city" class="form-ctrl" value="{{ profile.city }}"></div>
+          <div><label class="form-label-ft">COUNTRY</label><input type="text" name="country" class="form-ctrl" value="{{ profile.country }}"></div>
+        </div>
+        <hr class="divider">
+        <div style="font-family:var(--font-display);font-size:13px;font-weight:600;letter-spacing:1px;color:var(--text-secondary);margin-bottom:14px;">BODY METRICS</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
+          <div><label class="form-label-ft">HEIGHT (cm)</label><input type="number" name="height" class="form-ctrl" value="{{ profile.height }}" step="0.1"></div>
+          <div><label class="form-label-ft">WEIGHT (kg)</label><input type="number" name="weight" class="form-ctrl" value="{{ profile.weight }}" step="0.1"></div>
+          <div><label class="form-label-ft">TARGET WEIGHT (kg)</label><input type="number" name="target_weight" class="form-ctrl" value="{{ profile.target_weight }}" step="0.1"></div>
+          <div><label class="form-label-ft">ACTIVITY LEVEL</label>
+            <select name="activity_level" class="form-ctrl">
+              <option value="sedentary" {% if profile.activity_level == 'sedentary' %}selected{% endif %}>Sedentary</option>
+              <option value="light" {% if profile.activity_level == 'light' %}selected{% endif %}>Lightly Active</option>
+              <option value="moderate" {% if profile.activity_level == 'moderate' %}selected{% endif %}>Moderately Active</option>
+              <option value="active" {% if profile.activity_level == 'active' %}selected{% endif %}>Very Active</option>
+              <option value="extra" {% if profile.activity_level == 'extra' %}selected{% endif %}>Extra Active</option>
+            </select>
+          </div>
+        </div>
+        <hr class="divider">
+        <div style="font-family:var(--font-display);font-size:13px;font-weight:600;letter-spacing:1px;color:var(--text-secondary);margin-bottom:14px;">FITNESS GOALS & DAILY TARGETS</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
+          <div><label class="form-label-ft">FITNESS GOAL</label>
+            <select name="fitness_goal" class="form-ctrl">
+              <option value="lose" {% if profile.fitness_goal == 'lose' %}selected{% endif %}>Lose Weight</option>
+              <option value="maintain" {% if profile.fitness_goal == 'maintain' %}selected{% endif %}>Maintain</option>
+              <option value="gain" {% if profile.fitness_goal == 'gain' %}selected{% endif %}>Gain Muscle</option>
+              <option value="endurance" {% if profile.fitness_goal == 'endurance' %}selected{% endif %}>Build Endurance</option>
+              <option value="flexibility" {% if profile.fitness_goal == 'flexibility' %}selected{% endif %}>Flexibility</option>
+            </select>
+          </div>
+          <div><label class="form-label-ft">DAILY CALORIE GOAL</label><input type="number" name="daily_calorie_goal" class="form-ctrl" value="{{ profile.daily_calorie_goal }}"></div>
+          <div><label class="form-label-ft">WATER GOAL (L)</label><input type="number" name="daily_water_goal" class="form-ctrl" value="{{ profile.daily_water_goal }}" step="0.1"></div>
+          <div><label class="form-label-ft">STEPS GOAL</label><input type="number" name="daily_steps_goal" class="form-ctrl" value="{{ profile.daily_steps_goal }}" step="100"></div>
+        </div>
+        <div style="margin-bottom:20px;">
+          <label class="form-label-ft">BIO</label>
+          <textarea name="bio" class="form-ctrl" rows="2" placeholder="Tell us about your fitness journey...">{{ profile.bio }}</textarea>
+        </div>
+        <div style="margin-bottom:20px;">
+          <label class="form-label-ft">PROFILE AVATAR</label>
+          <input type="file" name="avatar" class="form-ctrl" accept="image/*">
+        </div>
+        <button type="submit" class="btn-ft btn-primary-ft"><i class="bi bi-check-circle-fill"></i> Save Profile</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

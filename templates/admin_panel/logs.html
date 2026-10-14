@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}System Logs{% endblock %}
+{% block page_title %}Security & Activity Logs{% endblock %}
+
+{% block content %}
+<div class="card fade-up">
+    <div class="card-header-ft">
+        <div class="card-title-ft"><i class="bi bi-terminal"></i> Live Audit Trail</div>
+        <div class="badge-ft badge-green">System Healthy</div>
+    </div>
+    <div class="card-body-ft" style="padding:0;">
+        <div style="background: #050505; color: #00ff00; font-family: 'JetBrains Mono', monospace; padding: 20px; font-size: 13px; line-height: 1.6; max-height: 500px; overflow-y: auto; border-radius: 0 0 12px 12px;">
+            {% for log in logs %}
+            <div><span style="color: #888;">[{{ log.time }}]</span> <span style="color: #00d4ff;">USR:{{ log.user }}</span> -> <span style="color: #ff6b35;">{{ log.action }}</span> <span style="color: #555;">(IP: {{ log.ip }})</span></div>
+            {% endfor %}
+            <div><span style="color: #888;">[{% now "Y-m-d H:i" %}]</span> <span style="color: #00d4ff;">SYS:DAEMON</span> -> <span style="color: #10b981;">Log monitor active...</span></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

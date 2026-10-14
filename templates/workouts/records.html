@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Personal Records{% endblock %}
+{% block page_title %}🏆 Personal Records{% endblock %}
+{% block content %}
+<div class="card fade-up">
+  <div class="card-header-ft"><div class="card-title-ft"><i class="bi bi-trophy-fill" style="color:var(--yellow);"></i> Your PRs</div></div>
+  <div style="overflow-x:auto;">
+    <table class="table-ft">
+      <thead><tr><th>Exercise</th><th>Record</th><th>Unit</th><th>Date</th><th>Notes</th></tr></thead>
+      <tbody>
+        {% for r in records %}
+        <tr>
+          <td style="font-weight:600;">{{ r.exercise.name }}</td>
+          <td><span style="font-family:var(--font-display);font-size:18px;color:var(--yellow);">{{ r.value }}</span></td>
+          <td style="color:var(--text-muted);">{{ r.unit }}</td>
+          <td>{{ r.date|date:"M d, Y" }}</td>
+          <td style="font-size:12px;color:var(--text-muted);">{{ r.notes|default:"—" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5"><div class="empty-state"><i class="bi bi-trophy"></i><p>No personal records yet. Keep training!</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

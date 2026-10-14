@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Food Database{% endblock %}
+{% block page_title %}🥦 Food Database{% endblock %}
+
+{% block content %}
+
+<!-- Category Filters -->
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;" class="fade-up">
+  
+  <a href="{% url 'diet:food_database' %}"
+     class="btn-ft {% if not category %}btn-primary-ft{% else %}btn-secondary-ft{% endif %} btn-sm-ft">
+    All
+  </a>
+
+  {% if categories %}
+    {% for cat in categories %}
+      <a href="?category={{ cat }}"
+         class="btn-ft {% if category == cat %}btn-primary-ft{% else %}btn-secondary-ft{% endif %} btn-sm-ft">
+        {{ cat|title }}
+      </a>
+    {% endfor %}
+  {% endif %}
+
+</div>
+
+<!-- Table -->
+<div class="card fade-up fade-up-d1">
+  <div style="overflow-x:auto;">
+
+    <table class="table-ft">
+      <thead>
+        <tr>
+          <th>Food</th>
+          <th>Category</th>
+          <th>Serving</th>
+          <th>Calories</th>
+          <th>Protein</th>
+          <th>Carbs</th>
+          <th>Fat</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        {% if foods %}
+          {% for food in foods %}
+            <tr>
+
+              <!-- Food -->
+              <td>
+                <div style="font-weight:600;">
+                  {{ food.name|default:"Unknown Food" }}
+                </div>
+                {% if food.brand %}
+                  <div style="font-size:11px;color:var(--text-muted);">
+                    {{ food.brand }}
+                  </div>
+                {% endif %}
+              </td>
+
+              <!-- Category -->
+              <td>
+                <span class="badge-ft badge-cyan">
+                  {{ food.get_category_display|default:"-" }}
+                </span>
+              </td>
+
+              <!-- Serving -->
+              <td style="font-size:12px;">
+                {{ food.serving_size|default:0 }}g
+              </td>
+
+              <!-- Calories -->
+              <td style="color:var(--accent2);font-weight:600;">
+                {{ food.calories|default:0|floatformat:0 }}
+              </td>
+
+              <!-- Macros -->
+              <td>{{ food.protein|default:0|floatformat:1 }}g</td>
+              <td>{{ food.carbohydrates|default:0|floatformat:1 }}g</td>
+              <td>{{ food.fat|default:0|floatformat:1 }}g</td>
+
+              <!-- Action -->
+              <td>
+                <a href="{% url 'diet:add_meal' %}?food={{ food.id }}"
+                   class="btn-ft btn-success-ft btn-sm-ft">
+                  <i class="bi bi-plus"></i> Add
+                </a>
+              </td>
+
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="8">
+              <div class="empty-state">
+                <i class="bi bi-database"></i>
+                <p>No food items found.</p>
+              </div>
+            </td>
+          </tr>
+        {% endif %}
+
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+{% endblock %}

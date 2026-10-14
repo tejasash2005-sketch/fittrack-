@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}System Stats{% endblock %}
+{% block page_title %}📊 System Statistics{% endblock %}
+{% block content %}
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;" class="fade-up">
+  <div class="stat-card cyan"><div class="stat-icon cyan"><i class="bi bi-people-fill"></i></div><div class="stat-value">{{ total_users }}</div><div class="stat-label">TOTAL USERS</div></div>
+  <div class="stat-card green"><div class="stat-icon green"><i class="bi bi-list-check"></i></div><div class="stat-value">{{ total_exercises }}</div><div class="stat-label">EXERCISES</div></div>
+  <div class="stat-card orange"><div class="stat-icon orange"><i class="bi bi-egg-fried"></i></div><div class="stat-value">{{ total_foods }}</div><div class="stat-label">FOOD ITEMS</div></div>
+  <div class="stat-card purple"><div class="stat-icon purple"><i class="bi bi-lightning-charge-fill"></i></div><div class="stat-value">{{ total_workouts }}</div><div class="stat-label">TOTAL WORKOUTS</div></div>
+  <div class="stat-card cyan"><div class="stat-icon cyan"><i class="bi bi-calendar-check"></i></div><div class="stat-value">{{ total_meals }}</div><div class="stat-label">TOTAL MEALS LOGGED</div></div>
+  <div class="stat-card green"><div class="stat-icon green"><i class="bi bi-graph-up"></i></div><div class="stat-value">{{ avg_workouts_per_user|floatformat:1 }}</div><div class="stat-label">AVG WORKOUTS / USER</div></div>
+</div>
+{% endblock %}

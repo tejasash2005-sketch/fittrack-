@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTrack Pro — Elite Fitness Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00f2ff;
+            --primary-dark: #00a8b3;
+            --bg-deep: #020617;
+            --bg-card: #0f172a;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --accent: #f43f5e;
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+            --gradient: linear-gradient(135deg, var(--primary) 0%, #7000ff 100%);
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Glassmorphism Classes */
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0; width: 100%;
+            padding: 24px 0;
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        nav.scrolled {
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(20px);
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .logo {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #fff;
+            text-decoration: none;
+        }
+        .logo span { color: var(--primary); }
+
+        /* Buttons */
+        .btn-glow {
+            background: var(--gradient);
+            color: #fff;
+            font-weight: 700;
+            padding: 16px 36px;
+            border-radius: 14px;
+            border: none;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            box-shadow: 0 10px 30px rgba(0, 242, 255, 0.2);
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-glow:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 242, 255, 0.4);
+            color: #fff;
+        }
+        .btn-outline {
+            background: transparent;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 16px 36px;
+            border-radius: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .btn-outline:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: #fff;
+            color: #fff;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 100px;
+            background:
+                radial-gradient(circle at 10% 20%, rgba(0, 242, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(112, 0, 255, 0.08) 0%, transparent 40%);
+        }
+
+        .hero-title {
+            font-size: clamp(3.5rem, 9vw, 6rem);
+            font-weight: 800;
+            line-height: 0.95;
+            letter-spacing: -2px;
+            margin-bottom: 24px;
+            background: linear-gradient(to bottom, #fff 50%, #888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .text-gradient {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-dim);
+            max-width: 580px;
+            margin-bottom: 48px;
+            line-height: 1.6;
+        }
+
+        .hero-image-wrap {
+            position: relative;
+        }
+        .hero-image {
+            width: 100%;
+            border-radius: 40px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Section Global */
+        section { padding: 120px 0; }
+        .section-tag {
+            color: var(--primary);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .section-title { font-size: clamp(2.5rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 40px; line-height: 1.1; }
+
+        /* Feature Cards */
+        .feature-box {
+            padding: 50px;
+            height: 100%;
+            transition: 0.4s;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 30px;
+        }
+        .feature-box:hover {
+            background: rgba(255,255,255,0.03);
+            transform: translateY(-10px);
+            border-color: var(--primary);
+        }
+        .feature-box i {
+            font-size: 40px;
+            margin-bottom: 30px;
+            display: block;
+            color: var(--primary);
+        }
+
+        /* About Section */
+        .about-img {
+            border-radius: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        /* Contact Form */
+        .contact-form .form-control {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px 20px;
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .contact-form .form-control:focus {
+            background: rgba(255,255,255,0.05);
+            border-color: var(--primary);
+            box-shadow: none;
+        }
+
+        /* Footer */
+        footer {
+            background: #000;
+            padding: 100px 0 40px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        @media (max-width: 991px) {
+            .hero { text-align: center; padding-top: 160px; }
+            .hero-subtitle { margin-left: auto; margin-right: auto; }
+            .hero-image-wrap { margin-top: 80px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav id="navbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="/" class="logo">⚡ FIT<span>TRACK</span></a>
+            <div class="d-none d-lg-flex gap-5 align-items-center">
+                <a href="#features" class="text-white text-decoration-none fw-semibold">Features</a>
+                <a href="#about" class="text-white text-decoration-none fw-semibold">Our Mission</a>
+                <a href="#contact" class="text-white text-decoration-none fw-semibold">Contact</a>
+                <a href="{% url 'accounts:login' %}" class="btn-outline" style="padding: 10px 24px;">Sign In</a>
+                <a href="{% url 'accounts:register' %}" class="btn-glow" style="padding: 10px 24px;">Join Now</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <span class="section-tag">High Performance Dashboard</span>
+                    <h1 class="hero-title">Master Your <span class="text-gradient">Evolution.</span></h1>
+                    <p class="hero-subtitle">FitTrack is the elite fitness management system for those who demand precision. Zero friction, maximum results.</p>
+                    <div class="d-flex flex-wrap gap-4 justify-content-center justify-content-lg-start">
+                        <a href="{% url 'accounts:register' %}" class="btn-glow">Access Platform</a>
+                        <a href="#features" class="btn-outline">View Capabilities</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 hero-image-wrap text-center">
+                    <img src="https://images.unsplash.com/photo-1593079831268-3381b0db4a77?q=80&w=2069&auto=format&fit=crop" alt="Dashboard Preview" class="hero-image">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="bg-card">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="section-tag">Core Capabilities</span>
+                <h2 class="section-title">Built for the Elite</h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-box">
+                        <i class="bi bi-activity"></i>
+                        <h3>Performance Logs</h3>
+                        <p class="text-dim">Log every session with surgical precision. Track RPE, volume, and recovery trends to ensure progressive overload.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-box">
+                        <i class="bi bi-pie-chart"></i>
+                        <h3>Fuel Tracking</h3>
+                        <p class="text-dim">Integrated food database with precise macro-nutrient analysis. Know exactly how you're fueling your transformation.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-box">
+                        <i class="bi bi-cpu"></i>
+                        <h3>Deep Intelligence</h3>
+                        <p class="text-dim">Advanced data visualization for body metrics, sleep quality, and mood. Turn numbers into actionable power.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-5 mb-lg-0">
+                    <img src="https://images.unsplash.com/photo-1534367507873-d2d7e24c797f?q=80&w=2070&auto=format&fit=crop" alt="About FitTrack" class="about-img w-100">
+                </div>
+                <div class="col-lg-5 offset-lg-1">
+                    <span class="section-tag">About FitTrack</span>
+                    <h2 class="section-title">Empowering the Driven</h2>
+                    <p class="text-dim mb-4">FitTrack was born out of a simple necessity: the need for a fitness platform that doesn't just track, but analyzes. We believe that data is the ultimate tool for human transformation.</p>
+                    <p class="text-dim mb-5">Our mission is to provide high-performers with a seamless, powerful, and private environment to master their physical potential. No ads, no fluff—just pure performance metrics.</p>
+                    <div class="d-flex gap-4">
+                        <div class="text-center">
+                            <h3 class="fw-800 text-gradient m-0">50k+</h3>
+                            <span class="small text-dim text-uppercase fw-bold">Active Users</span>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="fw-800 text-gradient m-0">12M+</h3>
+                            <span class="small text-dim text-uppercase fw-bold">Workouts Logged</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="bg-card">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="glass p-5">
+                        <div class="row">
+                            <div class="col-lg-6 pe-lg-5 mb-5 mb-lg-0">
+                                <span class="section-tag">Contact Support</span>
+                                <h2 class="section-title h1">Get in Touch</h2>
+                                <p class="text-dim mb-5">Have questions about our premium platform or need technical assistance? Our team of specialists is ready to help you optimize your experience.</p>
+
+                                <div class="d-flex align-items-center gap-4 mb-4">
+                                    <div class="f-icon m-0" style="width:50px; height:50px; font-size:20px;"><i class="bi bi-envelope"></i></div>
+                                    <div>
+                                        <div class="fw-bold">Email Us</div>
+                                        <div class="text-dim">support@fittrack-elite.com</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-4">
+                                    <div class="f-icon m-0" style="width:50px; height:50px; font-size:20px;"><i class="bi bi-geo-alt"></i></div>
+                                    <div>
+                                        <div class="fw-bold">Headquarters</div>
+                                        <div class="text-dim">Silicon Valley, CA, USA</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <form class="contact-form">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" placeholder="Full Name">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="email" class="form-control" placeholder="Email Address">
+                                        </div>
+                                    </div>
+                                    <input type="text" class="form-control" placeholder="Subject">
+                                    <textarea class="form-control" rows="5" placeholder="Your Message"></textarea>
+                                    <button type="submit" class="btn-glow w-100">Send Message</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="row gy-5">
+                <div class="col-lg-4">
+                    <a href="/" class="logo mb-4 d-block">⚡ FIT<span>TRACK</span></a>
+                    <p class="text-dim pe-lg-5">The ultimate fitness management platform for high-performers. Precision engineered for data-driven athletes.</p>
+                    <div class="d-flex gap-3 mt-4">
+                        <a href="#" class="btn-outline p-2" style="border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="btn-outline p-2" style="border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="btn-outline p-2" style="border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-2 offset-lg-1">
+                    <h5 class="fw-bold mb-4">Platform</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#features" class="text-dim text-decoration-none small d-block mb-2">Features</a></li>
+                        <li><a href="{% url 'accounts:register' %}" class="text-dim text-decoration-none small d-block mb-2">Join Now</a></li>
+                        <li><a href="#" class="text-dim text-decoration-none small d-block mb-2">Mobile App</a></li>
+                        <li><a href="#" class="text-dim text-decoration-none small d-block mb-2">API Docs</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h5 class="fw-bold mb-4">Company</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#about" class="text-dim text-decoration-none small d-block mb-2">About Us</a></li>
+                        <li><a href="#" class="text-dim text-decoration-none small d-block mb-2">Careers</a></li>
+                        <li><a href="#" class="text-dim text-decoration-none small d-block mb-2">Privacy Policy</a></li>
+                        <li><a href="#" class="text-dim text-decoration-none small d-block mb-2">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h5 class="fw-bold mb-4">Support</h5>
+                    <p class="text-dim small mb-4">Subscribe for the "Pulse" newsletter on performance science.</p>
+                    <div class="input-group">
+                        <input type="email" class="form-control bg-transparent border-secondary text-white" style="border-radius: 10px 0 0 10px;" placeholder="email@address.com">
+                        <button class="btn btn-primary px-3" style="border-radius: 0 10px 10px 0;"><i class="bi bi-send"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5 pt-5 border-top border-secondary text-center">
+                <p class="text-dim small">© 2024 FitTrack Elite. Mastered by Champions. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        window.onscroll = function() {
+            var nav = document.getElementById('navbar');
+            if (window.pageYOffset > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        };
+    </script>
+</body>
+</html>

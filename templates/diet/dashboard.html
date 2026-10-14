@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Nutrition{% endblock %}
+{% block page_title %}🥗 Nutrition Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- Date selector -->
+<div style="display:flex;justify-content:space-between;margin-bottom:20px;" class="fade-up">
+  <div style="display:flex;gap:12px;">
+    <input type="date" value="{{ selected_date|date:'Y-m-d' }}"
+           onchange="window.location='?date='+this.value">
+    <span>
+      {% if selected_date == today %}
+        Today
+      {% else %}
+        {{ selected_date|date:"M d, Y" }}
+      {% endif %}
+    </span>
+  </div>
+
+  <div style="display:flex;gap:8px;">
+    <a href="{% url 'diet:add_meal' %}">+ Meal</a>
+    <a href="{% url 'diet:food_database' %}">Foods</a>
+    <a href="{% url 'diet:goals' %}">Goals</a>
+  </div>
+</div>
+
+<!-- Stats -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+
+  <div>
+    <b>{{ totals.calories|default:0|floatformat:0 }}</b> kcal  
+    <div>Goal: {{ goal.daily_calories|default:0 }}</div>
+  </div>
+
+  <div>
+    <b>{{ totals.protein|default:0|floatformat:0 }}g</b> Protein  
+    <div>Goal: {{ goal.daily_protein|default:0 }}</div>
+  </div>
+
+  <div>
+    <b>{{ totals.carbs|default:0|floatformat:0 }}g</b> Carbs  
+    <div>Goal: {{ goal.daily_carbs|default:0 }}</div>
+  </div>
+
+  <div>
+    <b>{{ total_water_ml|default:0 }}ml</b> Water  
+    <div>Goal: {{ goal.daily_water_ml|default:0 }}</div>
+  </div>
+
+</div>
+
+<!-- Meals -->
+<div style="margin-top:20px;">
+
+  {% for mt in meal_types %}
+    <div style="margin-bottom:16px;border:1px solid #ddd;padding:10px;">
+
+      <div style="display:flex;justify-content:space-between;">
+        <b>{{ mt|title }}</b>
+        <a href="{% url 'diet:add_meal' %}?type={{ mt }}">+ Add</a>
+      </div>
+
+      {% for meal in meals %}
+        {% if meal.meal_type == mt %}
+          <div style="display:flex;justify-content:space-between;margin-top:6px;">
+            <span>{{ meal.food_item.name|default:"Food" }}</span>
+            <span>{{ meal.total_calories|default:0|floatformat:0 }} kcal</span>
+          </div>
+        {% endif %}
+      {% empty %}
+        <div>No meals</div>
+      {% endfor %}
+
+    </div>
+  {% endfor %}
+
+</div>
+
+<!-- Water -->
+<div style="margin-top:20px;">
+  <button onclick="logWater(250)">+250ml</button>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+
+// Safe data
+const protein = {{ totals.protein|default:0 }};
+const carbs = {{ totals.carbs|default:0 }};
+const fat = {{ totals.fat|default:0 }};
+const weekData = {{ week_data|default:"[]"|safe }};
+
+// Chart safe check
+if (typeof Chart !== "undefined") {
+  new Chart(document.createElement('canvas'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Protein','Carbs','Fat'],
+      datasets: [{ data: [protein, carbs, fat] }]
+    }
+  });
+}
+
+// Water logging
+function logWater(amount) {
+  const fd = new FormData();
+  fd.append('amount', amount);
+  fd.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+  fetch('{% url "diet:add_water" %}', {
+    method: 'POST',
+    body: fd
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) location.reload();
+  });
+}
+
+</script>
+{% endblock %}

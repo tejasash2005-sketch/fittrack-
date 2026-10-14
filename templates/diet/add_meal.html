@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block title %}Log Meal{% endblock %}
+{% block page_title %}🥗 Log Meal{% endblock %}
+
+{% block content %}
+<div style="max-width:700px;" class="fade-up">
+  <div class="card">
+    <div class="card-header-ft">
+      <div class="card-title-ft"><i class="bi bi-plus-circle-fill" style="color:var(--green);"></i> Add Meal Entry</div>
+      <a href="{% url 'diet:dashboard' %}" class="btn-ft btn-secondary-ft btn-sm-ft"><i class="bi bi-arrow-left"></i> Back</a>
+    </div>
+    <div class="card-body-ft">
+      <!-- Food search -->
+      <div style="margin-bottom:20px;">
+        <label class="form-label-ft">SEARCH FOOD</label>
+        <input type="text" id="foodSearch" class="form-ctrl" placeholder="Type to search foods..." oninput="searchFood(this.value)">
+        <div id="searchResults" style="margin-top:8px;max-height:200px;overflow-y:auto;background:var(--bg-secondary);border-radius:8px;display:none;"></div>
+      </div>
+
+      <form method="post" id="mealForm">
+        {% csrf_token %}
+        <div style="margin-bottom:16px;">
+          <label class="form-label-ft">FOOD ITEM *</label>
+          <select name="food_item" id="foodSelect" class="form-ctrl" required>
+            <option value="">Select a food item</option>
+            {% for food in foods %}
+            <option value="{{ food.id }}" data-calories="{{ food.calories }}" data-protein="{{ food.protein }}" data-carbs="{{ food.carbohydrates }}" data-fat="{{ food.fat }}" data-serving="{{ food.serving_size }}">
+              {{ food.name }} — {{ food.calories|floatformat:0 }} kcal / {{ food.serving_size }}g
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Nutrition preview -->
+        <div id="nutritionPreview" style="display:none;background:var(--bg-secondary);border-radius:10px;padding:14px;margin-bottom:16px;">
+          <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:10px;">NUTRITION PER SERVING</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;">
+            <div><div id="prev-cal" style="font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--accent2);">0</div><div style="font-size:10px;color:var(--text-muted);">KCAL</div></div>
+            <div><div id="prev-prot" style="font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--accent);">0g</div><div style="font-size:10px;color:var(--text-muted);">PROTEIN</div></div>
+            <div><div id="prev-carb" style="font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--accent3);">0g</div><div style="font-size:10px;color:var(--text-muted);">CARBS</div></div>
+            <div><div id="prev-fat" style="font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--yellow);">0g</div><div style="font-size:10px;color:var(--text-muted);">FAT</div></div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+          <div>
+            <label class="form-label-ft">MEAL TYPE</label>
+            <select name="meal_type" class="form-ctrl">
+              <option value="breakfast">🌅 Breakfast</option>
+              <option value="lunch" selected>☀️ Lunch</option>
+              <option value="dinner">🌙 Dinner</option>
+              <option value="snack">🍎 Snack</option>
+              <option value="pre_workout">⚡ Pre-Workout</option>
+              <option value="post_workout">🔥 Post-Workout</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label-ft">DATE</label>
+            <input type="date" name="date" class="form-ctrl" value="{{ today }}">
+          </div>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <label class="form-label-ft">SERVINGS (QUANTITY)</label>
+          <input type="number" name="quantity" class="form-ctrl" value="1" min="0.1" step="0.1" onchange="updatePreview()" id="quantityInput">
+        </div>
+
+        <div style="margin-bottom:20px;">
+          <label class="form-label-ft">NOTES (OPTIONAL)</label>
+          <input type="text" name="notes" class="form-ctrl" placeholder="e.g. with olive oil, grilled...">
+        </div>
+
+        <div style="display:flex;gap:12px;">
+          <button type="submit" class="btn-ft btn-primary-ft" style="flex:1;"><i class="bi bi-check-circle-fill"></i> Add to Meal Log</button>
+          <a href="{% url 'diet:dashboard' %}" class="btn-ft btn-secondary-ft">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Quick food suggestions -->
+  <div class="card" style="margin-top:16px;">
+    <div class="card-header-ft"><div class="card-title-ft"><i class="bi bi-star" style="color:var(--yellow);"></i> Common Foods</div></div>
+    <div class="card-body-ft">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        {% for food in foods|slice:":15" %}
+        <button type="button" onclick="selectFood({{ food.id }})" class="btn-ft btn-secondary-ft btn-sm-ft">
+          {% if food.category == 'protein' %}🥩{% elif food.category == 'fruits' %}🍎{% elif food.category == 'vegetables' %}🥦{% elif food.category == 'dairy' %}🥛{% elif food.category == 'grains' %}🌾{% else %}🍽️{% endif %}
+          {{ food.name }}
+        </button>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const foodData = {
+  {% for food in foods %}
+  {{ food.id }}: { name: '{{ food.name }}', calories: {{ food.calories }}, protein: {{ food.protein }}, carbs: {{ food.carbohydrates }}, fat: {{ food.fat }}, serving: {{ food.serving_size }} },
+  {% endfor %}
+};
+
+document.getElementById('foodSelect').addEventListener('change', function() {
+  updatePreview();
+});
+
+function updatePreview() {
+  const sel = document.getElementById('foodSelect');
+  const qty = parseFloat(document.getElementById('quantityInput').value) || 1;
+  const id = sel.value;
+  if (id && foodData[id]) {
+    const f = foodData[id];
+    document.getElementById('prev-cal').textContent = Math.round(f.calories * qty);
+    document.getElementById('prev-prot').textContent = (f.protein * qty).toFixed(1) + 'g';
+    document.getElementById('prev-carb').textContent = (f.carbs * qty).toFixed(1) + 'g';
+    document.getElementById('prev-fat').textContent = (f.fat * qty).toFixed(1) + 'g';
+    document.getElementById('nutritionPreview').style.display = 'block';
+  } else {
+    document.getElementById('nutritionPreview').style.display = 'none';
+  }
+}
+
+function selectFood(id) {
+  document.getElementById('foodSelect').value = id;
+  updatePreview();
+  document.getElementById('foodSelect').scrollIntoView({ behavior: 'smooth' });
+}
+
+let searchTimeout;
+function searchFood(q) {
+  clearTimeout(searchTimeout);
+  if (q.length < 2) { document.getElementById('searchResults').style.display = 'none'; return; }
+  searchTimeout = setTimeout(() => {
+    fetch(`{% url 'diet:food_search' %}?q=${encodeURIComponent(q)}`)
+      .then(r => r.json())
+      .then(data => {
+        const res = document.getElementById('searchResults');
+        if (data.foods.length === 0) { res.style.display = 'none'; return; }
+        res.innerHTML = data.foods.map(f => `
+          <div onclick="selectFood(${f.id})" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;" onmouseover="this.style.background='var(--bg-card)'" onmouseout="this.style.background=''">
+            <span style="font-size:14px;">${f.name}</span>
+            <span style="font-size:12px;color:var(--text-muted);">${f.calories|0} kcal</span>
+          </div>
+        `).join('');
+        res.style.display = 'block';
+      });
+  }, 300);
+}
+</script>
+{% endblock %}

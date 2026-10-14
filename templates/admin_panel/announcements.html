@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Announcements{% endblock %}
+{% block page_title %}System Announcements{% endblock %}
+
+{% block content %}
+<div class="card fade-up">
+    <div class="card-header-ft">
+        <div class="card-title-ft"><i class="bi bi-megaphone"></i> Broadcast Center</div>
+        <button class="btn-ft btn-primary-ft btn-sm-ft">New Broadcast</button>
+    </div>
+    <div class="card-body-ft" style="padding:0;">
+        <table class="table-ft">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Date Created</th>
+                    <th>Status</th>
+                    <th>Reach</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in announcements %}
+                <tr>
+                    <td><strong>{{ a.title }}</strong></td>
+                    <td>{{ a.date }}</td>
+                    <td><span class="badge-ft {% if a.status == 'Published' %}badge-green{% else %}badge-orange{% endif %}">{{ a.status }}</span></td>
+                    <td>{{ forloop.counter }}42 users</td>
+                    <td>
+                        <button class="btn-ft btn-secondary-ft btn-sm-ft">Edit</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

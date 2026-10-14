@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Notifications{% endblock %}
+{% block page_title %}🔔 Notifications{% endblock %}
+{% block content %}
+<div style="max-width:700px;" class="fade-up">
+  <div class="card">
+    <div class="card-header-ft"><div class="card-title-ft"><i class="bi bi-bell-fill" style="color:var(--accent);"></i> All Notifications</div></div>
+    <div>
+      {% for n in notifications %}
+      <div style="display:flex;gap:14px;padding:16px 20px;border-bottom:1px solid var(--border);">
+        <div style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--bg-secondary);">
+          {% if n.type == 'achievement' %}🏆{% elif n.type == 'goal' %}🎯{% elif n.type == 'reminder' %}⏰{% else %}ℹ️{% endif %}
+        </div>
+        <div style="flex:1;">
+          <div style="font-weight:600;font-size:14px;">{{ n.title }}</div>
+          <div style="font-size:13px;color:var(--text-secondary);margin-top:2px;">{{ n.message }}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">{{ n.created_at|date:"M d, Y H:i" }}</div>
+        </div>
+        <span class="badge-ft badge-{% if n.type == 'achievement' %}green{% elif n.type == 'goal' %}cyan{% else %}orange{% endif %}">{{ n.type|title }}</span>
+      </div>
+      {% empty %}
+      <div class="empty-state"><i class="bi bi-bell-slash"></i><p>No notifications yet. Complete workouts to earn them!</p></div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

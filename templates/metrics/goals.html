@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Health Goals{% endblock %}
+{% block page_title %}🎯 Health Goals{% endblock %}
+{% block content %}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="fade-up">
+  <div class="card">
+    <div class="card-header-ft"><div class="card-title-ft"><i class="bi bi-flag-fill" style="color:var(--accent2);"></i> Set New Goal</div></div>
+    <div class="card-body-ft">
+      <form method="post">
+        {% csrf_token %}
+        <div style="margin-bottom:14px;"><label class="form-label-ft">GOAL TYPE</label>
+          <select name="goal_type" class="form-ctrl">
+            <option value="weight">⚖️ Target Weight (kg)</option>
+            <option value="steps">👟 Daily Steps</option>
+            <option value="sleep">😴 Sleep Hours</option>
+            <option value="water">💧 Water Intake (ml)</option>
+            <option value="workout">💪 Workouts per Week</option>
+            <option value="body_fat">📊 Body Fat (%)</option>
+          </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+          <div><label class="form-label-ft">TARGET VALUE</label><input type="number" name="target_value" class="form-ctrl" placeholder="70" step="0.1" required></div>
+          <div><label class="form-label-ft">CURRENT VALUE</label><input type="number" name="current_value" class="form-ctrl" placeholder="80" step="0.1"></div>
+        </div>
+        <div style="margin-bottom:14px;"><label class="form-label-ft">DEADLINE (OPTIONAL)</label><input type="date" name="deadline" class="form-ctrl"></div>
+        <div style="margin-bottom:20px;"><label class="form-label-ft">NOTES</label><textarea name="notes" class="form-ctrl" rows="2"></textarea></div>
+        <button type="submit" class="btn-ft btn-primary-ft" style="width:100%;justify-content:center;"><i class="bi bi-plus-circle"></i> Add Goal</button>
+      </form>
+    </div>
+  </div>
+  <div>
+    <div style="font-family:var(--font-display);font-size:16px;font-weight:700;margin-bottom:14px;">Active Goals</div>
+    {% for goal in goals %}
+    <div class="card" style="margin-bottom:12px;padding:16px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-weight:600;">{{ goal.get_goal_type_display }}</div>
+        <span class="badge-ft {% if goal.is_achieved %}badge-green{% else %}badge-cyan{% endif %}">
+          {% if goal.is_achieved %}✅ Achieved{% else %}🎯 In Progress{% endif %}
+        </span>
+      </div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">{{ goal.current_value }} → {{ goal.target_value }}{% if goal.deadline %} · Due {{ goal.deadline|date:"M d" }}{% endif %}</div>
+      <div class="progress-ft" style="height:8px;"><div class="progress-fill fill-cyan" style="width:{{ goal.progress_percentage }}%;"></div></div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">{{ goal.progress_percentage }}% complete</div>
+    </div>
+    {% empty %}
+    <div class="empty-state"><i class="bi bi-flag"></i><p>No goals set yet. Add one!</p></div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

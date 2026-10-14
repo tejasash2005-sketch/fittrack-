@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Log Body Metrics{% endblock %}
+{% block page_title %}📏 Log Body Measurements{% endblock %}
+
+{% block content %}
+
+<div style="max-width:720px;" class="fade-up">
+  <div class="card">
+
+```
+<div class="card-header-ft">
+  <div class="card-title-ft">
+    <i class="bi bi-person-lines-fill" style="color:var(--accent);"></i>
+    Body Measurements
+  </div>
+  <a href="{% url 'metrics:dashboard' %}" class="btn-ft btn-secondary-ft btn-sm-ft">
+    <i class="bi bi-arrow-left"></i> Back
+  </a>
+</div>
+
+<div class="card-body-ft">
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- DATE -->
+    <div style="margin-bottom:16px;">
+      <label class="form-label-ft">DATE</label>
+      <input type="date" name="date" class="form-ctrl" value="{{ today|date:'Y-m-d' }}" style="max-width:200px;">
+    </div>
+
+    <!-- WEIGHT -->
+    <div style="font-family:var(--font-display);font-size:13px;font-weight:600;letter-spacing:1px;color:var(--text-secondary);margin-bottom:12px;">
+      WEIGHT & COMPOSITION
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
+      <input type="number" step="0.1" name="weight" class="form-ctrl" placeholder="Weight (kg)">
+      <input type="number" step="0.1" name="body_fat" class="form-ctrl" placeholder="Body Fat %">
+      <input type="number" step="0.1" name="muscle_mass" class="form-ctrl" placeholder="Muscle Mass (kg)">
+    </div>
+
+    <!-- MEASUREMENTS -->
+    <div style="font-family:var(--font-display);font-size:13px;font-weight:600;letter-spacing:1px;color:var(--text-secondary);margin-bottom:12px;">
+      BODY MEASUREMENTS (cm)
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
+      <input type="number" step="0.1" name="waist" class="form-ctrl" placeholder="Waist">
+      <input type="number" step="0.1" name="chest" class="form-ctrl" placeholder="Chest">
+      <input type="number" step="0.1" name="hips" class="form-ctrl" placeholder="Hips">
+      <input type="number" step="0.1" name="thighs" class="form-ctrl" placeholder="Thighs">
+      <input type="number" step="0.1" name="arms" class="form-ctrl" placeholder="Arms">
+      <input type="number" step="0.1" name="neck" class="form-ctrl" placeholder="Neck">
+    </div>
+
+    <!-- VITALS -->
+    <div style="font-family:var(--font-display);font-size:13px;font-weight:600;letter-spacing:1px;color:var(--text-secondary);margin-bottom:12px;">
+      VITALS
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
+      <input type="number" name="resting_hr" class="form-ctrl" placeholder="Resting HR">
+      <input type="number" name="bp_sys" class="form-ctrl" placeholder="BP Systolic">
+      <input type="number" name="bp_dia" class="form-ctrl" placeholder="BP Diastolic">
+    </div>
+
+    <!-- PHOTO -->
+    <div style="margin-bottom:16px;">
+      <label class="form-label-ft">PROGRESS PHOTO</label>
+      <input type="file" name="photo" class="form-ctrl" accept="image/*">
+    </div>
+
+    <!-- NOTES -->
+    <div style="margin-bottom:20px;">
+      <label class="form-label-ft">NOTES</label>
+      <textarea name="notes" class="form-ctrl" rows="2" placeholder="How are you feeling?"></textarea>
+    </div>
+
+    <button type="submit" class="btn-ft btn-primary-ft">
+      <i class="bi bi-check-circle-fill"></i> Save Measurements
+    </button>
+
+  </form>
+
+</div>
+```
+
+  </div>
+</div>
+
+{% endblock %}

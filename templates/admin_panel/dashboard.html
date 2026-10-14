@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}⚙️ Admin Control Panel{% endblock %}
+
+{% block content %}
+<!-- Admin header -->
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;padding:16px 20px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:12px;" class="fade-up">
+  <div style="width:44px;height:44px;background:linear-gradient(135deg,var(--accent3),var(--accent));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;">🛡️</div>
+  <div>
+    <div style="font-family:var(--font-display);font-size:18px;font-weight:700;">FitTrack Admin Center</div>
+    <div style="font-size:13px;color:var(--text-secondary);">Full system control · {{ today|date:"l, F j Y" }}</div>
+  </div>
+  <div style="margin-left:auto;display:flex;gap:8px;">
+    <a href="{% url 'admin_panel:user_management' %}" class="btn-ft btn-secondary-ft btn-sm-ft"><i class="bi bi-people"></i> Users</a>
+    <a href="{% url 'admin_panel:food_management' %}" class="btn-ft btn-secondary-ft btn-sm-ft"><i class="bi bi-database"></i> Foods</a>
+    <a href="{% url 'admin_panel:system_stats' %}" class="btn-ft btn-secondary-ft btn-sm-ft"><i class="bi bi-bar-chart"></i> Stats</a>
+    <a href="/admin/" class="btn-ft btn-primary-ft btn-sm-ft"><i class="bi bi-gear"></i> Django Admin</a>
+  </div>
+</div>
+
+<!-- Top KPIs -->
+<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:24px;" class="fade-up fade-up-d1">
+  <div class="stat-card cyan">
+    <div class="stat-icon cyan"><i class="bi bi-people-fill"></i></div>
+    <div class="stat-value">{{ total_users }}</div>
+    <div class="stat-label">TOTAL USERS</div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-icon green"><i class="bi bi-activity"></i></div>
+    <div class="stat-value">{{ active_today }}</div>
+    <div class="stat-label">ACTIVE TODAY</div>
+  </div>
+  <div class="stat-card orange">
+    <div class="stat-icon orange"><i class="bi bi-person-plus-fill"></i></div>
+    <div class="stat-value">{{ new_this_week }}</div>
+    <div class="stat-label">NEW THIS WEEK</div>
+  </div>
+  <div class="stat-card purple">
+    <div class="stat-icon purple"><i class="bi bi-lightning-charge-fill"></i></div>
+    <div class="stat-value">{{ total_workouts }}</div>
+    <div class="stat-label">TOTAL WORKOUTS</div>
+  </div>
+  <div class="stat-card cyan">
+    <div class="stat-icon cyan"><i class="bi bi-egg-fried"></i></div>
+    <div class="stat-value">{{ total_meals }}</div>
+    <div class="stat-label">MEALS LOGGED</div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-icon green"><i class="bi bi-star-fill"></i></div>
+    <div class="stat-value">{{ premium_users }}</div>
+    <div class="stat-label">PREMIUM USERS</div>
+  </div>
+</div>
+
+<!-- Charts row -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;" class="fade-up fade-up-d2">
+  <div class="card">
+    <div class="card-header-ft">
+      <div class="card-title-ft"><i class="bi bi-person-plus" style="color:var(--accent);"></i> User Signups (7 Days)</div>
+    </div>
+    <div class="card-body-ft">
+      <div class="chart-container" style="height:200px;">
+        <canvas id="signupChart"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header-ft">
+      <div class="card-title-ft"><i class="bi bi-lightning-charge" style="color:var(--accent2);"></i> Workout Activity (7 Days)</div>
+    </div>
+    <div class="card-body-ft">
+      <div class="chart-container" style="height:200px;">
+        <canvas id="workoutChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tables row -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="fade-up fade-up-d3">
+  <!-- Recent Users -->
+  <div class="card">
+    <div class="card-header-ft">
+      <div class="card-title-ft"><i class="bi bi-people" style="color:var(--accent3);"></i> Recent Users</div>
+      <a href="{% url 'admin_panel:user_management' %}" class="btn-ft btn-secondary-ft btn-sm-ft">Manage All</a>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="table-ft">
+        <thead><tr><th>User</th><th>Email</th><th>Joined</th><th>Action</th></tr></thead>
+        <tbody>
+          {% for user in recent_users %}
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent3),var(--accent));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">
+                  {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                </div>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--text-primary);">{{ user.get_full_name|default:user.username }}</div>
+                  <div style="font-size:11px;color:var(--text-muted);">@{{ user.username }}</div>
+                </div>
+              </div>
+            </td>
+            <td style="font-size:12px;">{{ user.email|truncatechars:20 }}</td>
+            <td style="font-size:12px;">{{ user.date_joined|date:"M d" }}</td>
+            <td>
+              <a href="{% url 'admin_panel:user_detail' user.pk %}" class="btn-ft btn-secondary-ft btn-sm-ft">View</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Recent Workouts -->
+  <div class="card">
+    <div class="card-header-ft">
+      <div class="card-title-ft"><i class="bi bi-lightning-charge" style="color:var(--accent2);"></i> Recent Workouts</div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="table-ft">
+        <thead><tr><th>User</th><th>Workout</th><th>Date</th><th>Duration</th></tr></thead>
+        <tbody>
+          {% for w in recent_workouts %}
+          <tr>
+            <td style="font-size:13px;font-weight:500;color:var(--text-primary);">{{ w.user.username }}</td>
+            <td style="font-size:12px;">{{ w.name|truncatechars:20 }}</td>
+            <td style="font-size:12px;">{{ w.date|date:"M d" }}</td>
+            <td><span class="badge-ft badge-cyan">{{ w.duration_minutes }}min</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const labels = {{ week_labels|safe }};
+const signupData = {{ week_signups|safe }};
+const workoutData = {{ week_workouts|safe }};
+
+new Chart(document.getElementById('signupChart'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [{
+      data: signupData,
+      backgroundColor: 'rgba(0,212,255,0.3)',
+      borderColor: 'var(--accent)',
+      borderWidth: 1.5,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { grid: { color: '#1e2d42' } }, y: { grid: { color: '#1e2d42' }, ticks: { stepSize: 1 } } }
+  }
+});
+
+new Chart(document.getElementById('workoutChart'), {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [{
+      data: workoutData,
+      borderColor: '#ff6b35',
+      backgroundColor: 'rgba(255,107,53,0.1)',
+      borderWidth: 2,
+      fill: true,
+      tension: 0.4,
+      pointBackgroundColor: '#ff6b35',
+      pointRadius: 5,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { grid: { color: '#1e2d42' } }, y: { grid: { color: '#1e2d42' }, ticks: { stepSize: 1 } } }
+  }
+});
+</script>
+{% endblock %}

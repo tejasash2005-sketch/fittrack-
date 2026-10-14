@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Exercise Library Manager{% endblock %}
+{% block page_title %}Exercise Library Manager{% endblock %}
+
+{% block content %}
+<div class="card fade-up">
+    <div class="card-header-ft">
+        <div class="card-title-ft"><i class="bi bi-list-stars"></i> Global Exercise Database</div>
+        <button class="btn-ft btn-primary-ft btn-sm-ft"><i class="bi bi-plus-lg"></i> Add New Exercise</button>
+    </div>
+    <div class="card-body-ft" style="padding:0;">
+        <table class="table-ft">
+            <thead>
+                <tr>
+                    <th>Exercise Name</th>
+                    <th>Category</th>
+                    <th>Target Muscle</th>
+                    <th>Intensity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exercise in exercises %}
+                <tr>
+                    <td><strong>{{ exercise.name }}</strong></td>
+                    <td><span class="badge-ft badge-cyan">{{ exercise.category }}</span></td>
+                    <td>{{ exercise.target_muscle_group }}</td>
+                    <td>{{ exercise.difficulty }}</td>
+                    <td>
+                        <button class="btn-ft btn-secondary-ft btn-sm-ft"><i class="bi bi-pencil"></i></button>
+                        <button class="btn-ft btn-danger-ft btn-sm-ft"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Workouts{% endblock %}
+{% block page_title %}💪 My Workouts{% endblock %}
+
+{% block content %}
+<!-- Summary bar -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;" class="fade-up">
+  <div class="stat-card orange">
+    <div class="stat-icon orange"><i class="bi bi-lightning-charge-fill"></i></div>
+    <div class="stat-value">{{ total_workouts }}</div>
+    <div class="stat-label">TOTAL WORKOUTS</div>
+  </div>
+  <div class="stat-card cyan">
+    <div class="stat-icon cyan"><i class="bi bi-clock-fill"></i></div>
+    <div class="stat-value">{{ total_hours }}</div>
+    <div class="stat-label">TOTAL HOURS</div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-icon green"><i class="bi bi-fire"></i></div>
+    <div class="stat-value">{{ total_calories }}</div>
+    <div class="stat-label">CALORIES BURNED</div>
+  </div>
+  <div class="stat-card purple">
+    <div class="stat-icon purple"><i class="bi bi-trophy-fill"></i></div>
+    <div class="stat-value">🔥 {{ streak.current_streak }}</div>
+    <div class="stat-label">DAY STREAK</div>
+    <div class="stat-sub">Best: {{ streak.longest_streak }} days</div>
+  </div>
+</div>
+
+<!-- Actions bar -->
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;" class="fade-up fade-up-d1">
+  <div style="display:flex;gap:8px;">
+    <a href="{% url 'workouts:log' %}" class="btn-ft btn-primary-ft"><i class="bi bi-plus-circle"></i> Log Workout</a>
+    <a href="{% url 'workouts:exercises' %}" class="btn-ft btn-secondary-ft"><i class="bi bi-list-check"></i> Exercise Library</a>
+    <a href="{% url 'workouts:calendar' %}" class="btn-ft btn-secondary-ft"><i class="bi bi-calendar3"></i> Calendar</a>
+    <a href="{% url 'workouts:records' %}" class="btn-ft btn-secondary-ft"><i class="bi bi-trophy"></i> PRs</a>
+  </div>
+</div>
+
+<!-- Workout list -->
+<div class="card fade-up fade-up-d2">
+  <div class="card-header-ft">
+    <div class="card-title-ft"><i class="bi bi-list-ul" style="color:var(--accent2);"></i> Workout History</div>
+  </div>
+  <div style="overflow-x:auto;">
+    {% if sessions %}
+    <table class="table-ft">
+      <thead>
+        <tr>
+          <th>Workout Name</th>
+          <th>Date</th>
+          <th>Duration</th>
+          <th>Calories</th>
+          <th>Effort</th>
+          <th>Mood After</th>
+          <th>Notes</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in sessions %}
+        <tr>
+          <td>
+            <a href="{% url 'workouts:detail' s.pk %}" style="color:var(--text-primary);text-decoration:none;font-weight:600;">
+              {{ s.name }}
+            </a>
+            {% if s.location %}<div style="font-size:11px;color:var(--text-muted);"><i class="bi bi-geo-alt"></i> {{ s.location }}</div>{% endif %}
+          </td>
+          <td>{{ s.date|date:"M d, Y" }}</td>
+          <td>
+            <span class="badge-ft badge-cyan">
+              {% if s.duration_minutes >= 60 %}{{ s.duration_minutes|divisibleby:60 }}h {% endif %}{{ s.duration_minutes }}min
+            </span>
+          </td>
+          <td style="color:var(--accent2);font-weight:600;">{{ s.total_calories_burned|floatformat:0 }} kcal</td>
+          <td>
+            <div style="display:flex;gap:2px;">
+              {% for i in "12345678910" %}
+                {% if forloop.counter <= s.perceived_effort %}
+                  <div style="width:5px;height:14px;background:{% if s.perceived_effort <= 3 %}var(--green){% elif s.perceived_effort <= 6 %}var(--yellow){% else %}var(--red){% endif %};border-radius:2px;"></div>
+                {% else %}
+                  <div style="width:5px;height:14px;background:var(--border);border-radius:2px;"></div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </td>
+          <td>
+            {% if s.mood_after >= 8 %}😄{% elif s.mood_after >= 6 %}😊{% elif s.mood_after >= 4 %}😐{% else %}😞{% endif %}
+            {{ s.mood_after }}/10
+          </td>
+          <td style="font-size:12px;color:var(--text-muted);">{{ s.notes|truncatechars:30 }}</td>
+          <td>
+            <div style="display:flex;gap:6px;">
+              <a href="{% url 'workouts:detail' s.pk %}" class="btn-ft btn-secondary-ft btn-sm-ft"><i class="bi bi-eye"></i></a>
+              <a href="{% url 'workouts:delete' s.pk %}" class="btn-ft btn-danger-ft btn-sm-ft" onclick="return confirm('Delete this workout?')"><i class="bi bi-trash"></i></a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <i class="bi bi-lightning-charge"></i>
+      <p>No workouts logged yet!</p>
+      <a href="{% url 'workouts:log' %}" class="btn-ft btn-primary-ft" style="margin-top:12px;"><i class="bi bi-plus"></i> Log Your First Workout</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

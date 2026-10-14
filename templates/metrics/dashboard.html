@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% block title %}Health Metrics{% endblock %}
+{% block page_title %}📊 Health Metrics{% endblock %}
+
+{% block content %}
+<!-- Quick action bar -->
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;" class="fade-up">
+  <a href="{% url 'metrics:log_body' %}" class="btn-ft btn-primary-ft"><i class="bi bi-person-lines-fill"></i> Log Measurements</a>
+  <a href="{% url 'metrics:log_steps' %}" class="btn-ft btn-secondary-ft"><i class="bi bi-person-walking"></i> Log Steps</a>
+  <a href="{% url 'metrics:log_sleep' %}" class="btn-ft btn-secondary-ft"><i class="bi bi-moon-stars"></i> Log Sleep</a>
+  <a href="{% url 'metrics:log_mood' %}" class="btn-ft btn-secondary-ft"><i class="bi bi-emoji-smile"></i> Log Mood</a>
+  <a href="{% url 'metrics:goals' %}" class="btn-ft btn-secondary-ft"><i class="bi bi-flag"></i> Set Goals</a>
+  <a href="{% url 'metrics:photos' %}" class="btn-ft btn-secondary-ft"><i class="bi bi-camera"></i> Progress Photos</a>
+</div>
+
+<!-- Today's snapshot -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;" class="fade-up fade-up-d1">
+  <!-- Weight -->
+  <div class="stat-card cyan">
+    <div class="stat-icon cyan"><i class="bi bi-person-fill"></i></div>
+    {% if latest and latest.weight %}
+    <div class="stat-value">{{ latest.weight }}</div>
+    <div class="stat-label">WEIGHT (KG)</div>
+    <div class="stat-sub">Last: {{ latest.date|date:"M d" }} · BMI: {{ latest.bmi|default:"—" }}</div>
+    {% else %}
+    <div class="stat-value">—</div>
+    <div class="stat-label">WEIGHT (KG)</div>
+    <div class="stat-sub"><a href="{% url 'metrics:log_body' %}" style="color:var(--accent);">Log now →</a></div>
+    {% endif %}
+  </div>
+  <!-- Steps -->
+  <div class="stat-card green">
+    <div class="stat-icon green"><i class="bi bi-person-walking"></i></div>
+    <div class="stat-value">{{ today_steps.steps|default:0 }}</div>
+    <div class="stat-label">STEPS TODAY</div>
+    <div class="stat-sub">{{ today_steps.distance_km|default:0 }}km · {{ today_steps.calories_burned|default:0 }} kcal</div>
+  </div>
+  <!-- Sleep -->
+  <div class="stat-card purple">
+    <div class="stat-icon purple"><i class="bi bi-moon-stars-fill"></i></div>
+    <div class="stat-value">{{ today_sleep.duration_hours|default:"—" }}</div>
+    <div class="stat-label">SLEEP HOURS</div>
+    <div class="stat-sub">
+      {% if today_sleep %}Quality: {{ today_sleep.quality }}/5{% else %}<a href="{% url 'metrics:log_sleep' %}" style="color:var(--accent3);">Log sleep →</a>{% endif %}
+    </div>
+  </div>
+  <!-- Mood -->
+  <div class="stat-card orange">
+    <div class="stat-icon orange"><i class="bi bi-emoji-smile-fill"></i></div>
+    <div class="stat-value">
+      {% if today_mood %}
+        {% if today_mood.mood == 5 %}😄{% elif today_mood.mood == 4 %}😊{% elif today_mood.mood == 3 %}😐{% elif today_mood.mood == 2 %}😞{% else %}😢{% endif %}
+      {% else %}—{% endif %}
+    </div>
+    <div class="stat-label">MOOD TODAY</div>
+    <div class="stat-sub">
+      {% if today_mood %}Energy: {{ today_mood.energy }}/5 · Stress: {{ today_mood.stress_level }}/10
+      {% else %}<a href="{% url 'metrics:log_mood' %}" style="color:var(--accent2);">Log mood →</a>{% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;" class="fade-up fade-up-d2">
+  <!-- Weight trend -->
+  <div class="card">
+    <div class="card-header-ft">
+      <div class="card-title-ft"><i class="bi bi-graph-up-arrow" style="color:var(--accent);"></i> Weight Trend (30 Days)</div>
+    </div>
+    <div class="card-body-ft">
+      <canvas id="weightChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- Steps trend -->
+  <div class="card">
+    <div class="card-header-ft">
+      <div class="card-title-ft"><i class="bi bi-person-walking" style="color:var(--green);"></i> Steps (7 Days)</div>
+    </div>
+    <div class="card-body-ft">
+      <canvas id="stepsChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Sleep + Goals -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;" class="fade-up fade-up-d3">
+  <!-- Sleep trend -->
+  <div class="card">
+    <div class="card-header-ft">
+      <div class="card-title-ft"><i class="bi bi-moon-stars-fill" style="color:var(--accent3);"></i> Sleep (7 Days)</div>
+    </div>
+    <div class="card-body-ft">
+      <canvas id="sleepChart" height="160"></canvas>
+    </div>
+  </div>
+
+  <!-- Health Goals -->
+  <div class="card">
+    <div class="card-header-ft">
+      <div class="card-title-ft"><i class="bi bi-flag-fill" style="color:var(--accent2);"></i> Health Goals</div>
+      <a href="{% url 'metrics:goals' %}" class="btn-ft btn-secondary-ft btn-sm-ft">Manage</a>
+    </div>
+    <div class="card-body-ft">
+      {% if goals %}
+        {% for goal in goals %}
+        <div style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;">
+            <span style="font-weight:600;">{{ goal.get_goal_type_display }}</span>
+            <span style="color:var(--text-muted);">{{ goal.current_value }}/{{ goal.target_value }}</span>
+          </div>
+          <div class="progress-ft" style="height:8px;">
+            <div class="progress-fill fill-cyan" style="width:{{ goal.progress_percentage }}%;"></div>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">{{ goal.progress_percentage }}% complete{% if goal.deadline %} · Due {{ goal.deadline|date:"M d" }}{% endif %}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state" style="padding:24px;">
+          <i class="bi bi-flag"></i>
+          <p>No goals set yet</p>
+          <a href="{% url 'metrics:goals' %}" class="btn-ft btn-primary-ft" style="margin-top:8px;font-size:13px;">Set a Goal</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Recent measurements -->
+{% if recent_metrics %}
+<div class="card fade-up fade-up-d4">
+  <div class="card-header-ft">
+    <div class="card-title-ft"><i class="bi bi-table" style="color:var(--accent);"></i> Recent Measurements</div>
+    <a href="{% url 'metrics:log_body' %}" class="btn-ft btn-primary-ft btn-sm-ft"><i class="bi bi-plus"></i> New Entry</a>
+  </div>
+  <div style="overflow-x:auto;">
+    <table class="table-ft">
+      <thead><tr><th>Date</th><th>Weight</th><th>Body Fat</th><th>Waist</th><th>Chest</th><th>Heart Rate</th><th>BP</th></tr></thead>
+      <tbody>
+        {% for m in recent_metrics %}
+        <tr>
+          <td>{{ m.date|date:"M d, Y" }}</td>
+          <td>{% if m.weight %}<strong>{{ m.weight }}kg</strong>{% else %}—{% endif %}</td>
+          <td>{% if m.body_fat_percentage %}{{ m.body_fat_percentage }}%{% else %}—{% endif %}</td>
+          <td>{% if m.waist %}{{ m.waist }}cm{% else %}—{% endif %}</td>
+          <td>{% if m.chest %}{{ m.chest }}cm{% else %}—{% endif %}</td>
+          <td>{% if m.resting_heart_rate %}<span class="badge-ft badge-cyan">{{ m.resting_heart_rate }} BPM</span>{% else %}—{% endif %}</td>
+          <td>{% if m.blood_pressure_systolic %}{{ m.blood_pressure_systolic }}/{{ m.blood_pressure_diastolic }}{% else %}—{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Weight chart
+new Chart(document.getElementById('weightChart'), {
+  type: 'line',
+  data: {
+    labels: {{ weight_labels|safe }},
+    datasets: [{
+      label: 'Weight (kg)',
+      data: {{ weight_values|safe }},
+      borderColor: '#00d4ff',
+      backgroundColor: 'rgba(0,212,255,0.08)',
+      borderWidth: 2,
+      fill: true,
+      tension: 0.4,
+      pointBackgroundColor: '#00d4ff',
+      pointRadius: 3,
+      spanGaps: true,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { grid: { color: '#1e2d42' } }, y: { grid: { color: '#1e2d42' } } }
+  }
+});
+
+// Steps chart
+new Chart(document.getElementById('stepsChart'), {
+  type: 'bar',
+  data: {
+    labels: {{ step_labels|safe }},
+    datasets: [{
+      label: 'Steps',
+      data: {{ step_values|safe }},
+      backgroundColor: 'rgba(16,185,129,0.4)',
+      borderColor: '#10b981',
+      borderWidth: 1.5,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { grid: { display: false } }, y: { grid: { color: '#1e2d42' } } }
+  }
+});
+
+// Sleep chart
+new Chart(document.getElementById('sleepChart'), {
+  type: 'bar',
+  data: {
+    labels: {{ step_labels|safe }},
+    datasets: [{
+      label: 'Hours',
+      data: {{ sleep_data|safe }},
+      backgroundColor: 'rgba(124,58,237,0.4)',
+      borderColor: '#7c3aed',
+      borderWidth: 1.5,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { color: '#1e2d42' }, suggestedMax: 10 }
+    }
+  }
+});
+</script>
+{% endblock %}

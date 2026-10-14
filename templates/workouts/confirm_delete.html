@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Delete Workout{% endblock %}
+{% block page_title %}🗑️ Delete Workout{% endblock %}
+{% block content %}
+<div style="max-width:440px;" class="fade-up">
+  <div class="card">
+    <div class="card-body-ft" style="text-align:center;padding:36px;">
+      <div style="font-size:48px;margin-bottom:16px;">⚠️</div>
+      <div style="font-family:var(--font-display);font-size:20px;font-weight:700;margin-bottom:8px;">Delete Workout?</div>
+      <p style="font-size:14px;color:var(--text-secondary);margin-bottom:24px;">Are you sure you want to delete <strong>{{ session.name }}</strong> from {{ session.date|date:"M d, Y" }}? This cannot be undone.</p>
+      <form method="post" style="display:flex;gap:12px;justify-content:center;">
+        {% csrf_token %}
+        <button type="submit" class="btn-ft btn-danger-ft"><i class="bi bi-trash"></i> Yes, Delete</button>
+        <a href="{% url 'workouts:list' %}" class="btn-ft btn-secondary-ft">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

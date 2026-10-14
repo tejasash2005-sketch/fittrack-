@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Achievement Manager{% endblock %}
+{% block page_title %}Badges & Achievements{% endblock %}
+
+{% block content %}
+<div class="row g-4 fade-up">
+    {% for ach in achievements %}
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body-ft text-center">
+                <div style="font-size: 40px; margin-bottom: 10px;">{{ ach.icon|default:"🏆" }}</div>
+                <h4 class="rajdhani">{{ ach.name }}</h4>
+                <p class="text-muted small">{{ ach.description }}</p>
+                <div class="badge-ft badge-purple">{{ ach.points }} Points</div>
+                <div class="mt-3">
+                    <button class="btn-ft btn-secondary-ft btn-sm-ft w-100">Edit Achievement</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <div class="col-md-4">
+        <div class="card h-100" style="border-style: dashed; background: transparent; display: flex; align-items: center; justify-content: center; min-height: 200px;">
+            <button class="btn-ft btn-primary-ft"><i class="bi bi-plus-circle"></i> Create New</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

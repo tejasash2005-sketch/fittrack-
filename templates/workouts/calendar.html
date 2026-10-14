@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Workout Calendar{% endblock %}
+{% block page_title %}📅 Workout Calendar{% endblock %}
+
+{% block content %}
+<div class="card fade-up" style="max-width:700px;">
+  <div class="card-header-ft">
+    <div class="card-title-ft"><i class="bi bi-calendar3" style="color:var(--accent);"></i> Workout Calendar</div>
+    <a href="{% url 'workouts:log' %}" class="btn-ft btn-primary-ft btn-sm-ft"><i class="bi bi-plus"></i> Log Workout</a>
+  </div>
+  <div class="card-body-ft">
+    <div id="calendar" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;">
+      <div style="text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);padding:6px;">Sun</div>
+      <div style="text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);padding:6px;">Mon</div>
+      <div style="text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);padding:6px;">Tue</div>
+      <div style="text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);padding:6px;">Wed</div>
+      <div style="text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);padding:6px;">Thu</div>
+      <div style="text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);padding:6px;">Fri</div>
+      <div style="text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);padding:6px;">Sat</div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:16px;font-size:12px;">
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--accent);margin-right:4px;"></span>Workout done</span>
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--border);margin-right:4px;"></span>Rest day</span>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const workoutDates = new Set({{ workout_dates|safe }});
+const today = new Date();
+const year = today.getFullYear();
+const month = today.getMonth();
+const firstDay = new Date(year, month, 1).getDay();
+const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+const cal = document.getElementById('calendar');
+for (let i = 0; i < firstDay; i++) {
+  cal.appendChild(Object.assign(document.createElement('div'), {}));
+}
+for (let d = 1; d <= daysInMonth; d++) {
+  const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  const isToday = d === today.getDate();
+  const hasWorkout = workoutDates.has(dateStr);
+  const cell = document.createElement('div');
+  cell.style.cssText = `
+    text-align:center;padding:10px 6px;border-radius:8px;font-size:14px;font-weight:${isToday?'700':'500'};
+    background:${hasWorkout?'rgba(0,212,255,0.2)':isToday?'rgba(255,255,255,0.05)':'transparent'};
+    border:${isToday?'1px solid var(--accent)':hasWorkout?'1px solid rgba(0,212,255,0.3)':'1px solid transparent'};
+    color:${hasWorkout?'var(--accent)':isToday?'var(--text-primary)':'var(--text-secondary)'};
+    cursor:pointer;transition:all 0.2s;
+  `;
+  cell.textContent = hasWorkout ? `${d} ⚡` : d;
+  cell.title = hasWorkout ? 'Workout completed!' : 'Rest day';
+  cal.appendChild(cell);
+}
+</script>
+{% endblock %}
